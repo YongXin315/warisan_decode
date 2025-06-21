@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Badge Earned - Warisan Decode</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: url('imgs/badge-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Press Start 2P', cursive;
+      color: #fff;
+    }
+
+    .badge-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 70px); /* subtract navbar height */
+      padding: 20px;
+      text-align: center;
+    }
+
+    .badge-container {
+      background: rgba(0, 0, 0, 0.75);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+      max-width: 600px;
+      width: 90%;
+      animation: pop 0.8s ease-out;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .badge-container img {
+      width: 150px;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .badge-container h1 {
+      font-size: 14px;
+      color: #ffd700;
+      margin-bottom: 20px;
+    }
+
+    .badge-container p {
+      font-size: 10px;
+      margin-bottom: 30px;
+    }
+
+    .next-button {
+      padding: 10px 20px;
+      background-color: #ffcc00;
+      border: 2px solid #000;
+      font-size: 10px;
+      text-decoration: none;
+      color: #000;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    .next-button:hover {
+      background-color: #ffa500;
+    }
+
+    /* Navbar override for dark background */
+    .navbar {
+      background-color: rgba(0, 0, 0, 0.75) !important;
+      padding: 30px;
+    }
+
+    .navbar-brand,
+    .navbar-nav .nav-link {
+      color: #fff !important;
+      font-size: 12px;
+    }
+
+    .navbar-nav .nav-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🌟 Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Warisan Decode</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav ms-auto">
+          <a class="nav-link" href="maps-leaflet.html">Home</a>
+          <a class="nav-link" href="rules.html">Rules</a>
+          <a class="nav-link" href="profile.php">Achievements</a>
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🌟 Badge Content -->
+  <div class="badge-wrapper">
+    <div class="badge-container">
+      <img src="imgs/badge_1.png" alt="Badge earned" />
+      <h1>🎉 Congratulations!</h1>
+      <p>You’ve successfully completed Checkpoint 1 <br> and earned the <br><strong>Nyonya Laksa</strong> badge!</p>
+      <a href="checkpoint2.html" class="next-button">Continue to Next Checkpoint</a>
+    </div>
+  </div>
+</body>
+</html>
