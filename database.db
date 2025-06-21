@@ -19,7 +19,7 @@ CREATE TABLE checkpoints (
   checkpoint_number INT NOT NULL,
   cipher TEXT,
   answer TEXT,
-  FOREIGN_KEY (state_id) REFERENCES (states)id
+  FOREIGN KEY (state_id) REFERENCES (states)id
 );
 
 CREATE TABLE progress (
