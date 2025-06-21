@@ -177,9 +177,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto">
-                    <a class="nav-link" href="#">Home</a>
-                    <a class="nav-link" href="rules.html">Rules</a>
-                    <a class="nav-link" href="profile.php">Achievements</a>
+                    <a class="nav-link" href="welcome.php">Home</a>
+                    <a class="nav-link" href="maps-leaflet.html">Heritage Map</a>
+                    <a class="nav-link" href="profile.php">Profile</a>
                     <a class="nav-link" href="logout.php">Logout</a>
                 </div>
             </div>
@@ -233,10 +233,11 @@
             if (isHeritageUnlocked(siteId)) return true;
             
             // Can play if it's the next site in sequence for this state
+            const unlockedSites = JSON.parse(localStorage.getItem('unlockedHeritageSites') || '[]');
             const stateSites = heritageSites.filter(site => site.state === stateName).sort((a, b) => a.id - b.id);
             
             // Find the highest unlocked ID in this state
-            let highestUnlocked = 0; // Start with 0, since ID 1 is always unlocked
+            let highestUnlocked = 1; // Start with ID 1 (always unlocked)
             for (let site of stateSites) {
                 if (isHeritageUnlocked(site.id)) {
                     highestUnlocked = site.id;
@@ -303,17 +304,6 @@
             },
             {
                 id: 3,
-                name: "St. Paul's Church",
-                lat: 2.1898,
-                lng: 102.2502,
-                category: "historical",
-                state: "Melaka",
-                description: "Ruined Portuguese church on St. Paul's Hill",
-                details: "Built in 1521, originally called Our Lady of the Hill, where St. Francis Xavier was temporarily entombed",
-                color: "#ff4444",
-            },
-            {
-                id: 4,
                 name: "Cheng Hoon Teng Temple",
                 lat: 2.1967,
                 lng: 102.2431,
@@ -321,17 +311,6 @@
                 state: "Melaka",
                 description: "Malaysia's oldest traditional Chinese temple",
                 details: "Built in 1673 by Chinese Captain Lee Wei King, dedicated to Goddess of Mercy Kuan Yin, features intricate woodwork without nails",
-                color: "#4444ff",
-            },
-            {
-                id: 5,
-                name: "Sri Poyyatha Vinayagar Moorthi Temple",
-                lat: 2.1956,
-                lng: 102.2478,
-                category: "religious",
-                state: "Melaka",
-                description: "Oldest Hindu temple in Malaysia",
-                details: "Built in 1781, dedicated to Lord Vinayagar (Ganesha), showcases South Indian Dravidian architecture and Tamil culture",
                 color: "#4444ff",
             },
             {

@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     echo "<p>⚠️ You must be logged in to collect a badge.</p>";
     exit;
 }
+require 'checkpoint3.html';
 
 // Step 2: Get the user ID and badge name
 $userId = $_SESSION['user_id'];

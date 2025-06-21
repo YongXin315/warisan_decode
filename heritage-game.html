@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title id="page-title">Heritage Quest - Warisan Decode</title>
@@ -13,677 +13,600 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
-    
+
     <style>
-        .game-container {
-            margin-top: 70px;
-            height: calc(100vh - 70px);
-            position: relative;
-            overflow: hidden;
+      .game-container {
+        margin-top: 70px;
+        height: calc(100vh - 70px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .treasure-map {
+        width: 100%;
+        height: 100%;
+        background-image: url("imgs/bg.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+        border: 10px solid #8b4513;
+        box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.3);
+      }
+
+      .game-header {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 15px 30px;
+        border-radius: 15px;
+        border: 3px solid #ffd600;
+      }
+
+      .game-header h1 {
+        font-size: 16px;
+        color: #ffd600;
+        margin: 0;
+        text-shadow: 2px 2px 0px #000;
+      }
+
+      .game-header p {
+        font-size: 8px;
+        color: #fff;
+        margin: 5px 0 0 0;
+      }
+
+      .checkpoint {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+      }
+
+      .checkpoint:hover {
+        transform: scale(1.2);
+        filter: brightness(1.3);
+      }
+
+      .checkpoint-icon {
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, #ff4444, #cc0000);
+        border: 4px solid #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        text-shadow: 1px 1px 2px #000;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
         }
-        
-        .treasure-map {
-            width: 100%;
-            height: 100%;
-            background-image: url("imgs/bg.jpg");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
-            border: 10px solid #8b4513;
-            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.3);
+        50% {
+          transform: scale(1.1);
         }
-        
-        .game-header {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px 30px;
-            border-radius: 15px;
-            border: 3px solid #ffd600;
-        }
-        
-        .game-header h1 {
-            font-size: 16px;
-            color: #ffd600;
-            margin: 0;
-            text-shadow: 2px 2px 0px #000;
-        }
-        
-        .game-header p {
-            font-size: 8px;
-            color: #fff;
-            margin: 5px 0 0 0;
-        }
-        
+      }
+
+      .checkpoint-label {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: #ffd600;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 6px;
+        white-space: nowrap;
+        border: 2px solid #ffd600;
+        text-align: center;
+      }
+
+      .checkpoint-year {
+        font-size: 5px;
+        color: #fff;
+        margin-top: 2px;
+      }
+
+      .path {
+        position: absolute;
+        border: 3px dashed #8b4513;
+        opacity: 0.7;
+        z-index: 1;
+      }
+
+      .compass {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 80px;
+        height: 80px;
+        background: rgba(139, 69, 19, 0.8);
+        border: 3px solid #ffd600;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #ffd600;
+      }
+
+      .back-btn {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color: #ffd600;
+        color: #000;
+        border: 2px solid #000;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-family: "Press Start 2P", cursive;
+        font-size: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        z-index: 100;
+      }
+
+      .back-btn:hover {
+        background-color: #ffa000;
+        color: #000;
+        transform: translateY(-2px);
+      }
+
+      .game-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 30px;
+        border: 3px solid #ffd600;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+      }
+
+      .modal-content h2 {
+        font-size: 14px;
+        color: #000;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #ffd600;
+        padding-bottom: 10px;
+      }
+
+      .modal-content p {
+        font-size: 8px;
+        color: #333;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      .game-options {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .game-btn {
+        background-color: #ffd600;
+        color: #000;
+        border: 2px solid #000;
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-family: "Press Start 2P", cursive;
+        font-size: 7px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .game-btn:hover {
+        background-color: #ffa000;
+        color: #000;
+        transform: translateY(-2px);
+      }
+
+      .close-btn {
+        background-color: #ff4444;
+        color: #fff;
+      }
+
+      .close-btn:hover {
+        background-color: #cc0000;
+        color: #fff;
+      }
+
+      .no-sites-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: #ffd600;
+        padding: 30px;
+        border-radius: 15px;
+        border: 3px solid #ffd600;
+        text-align: center;
+        font-size: 12px;
+      }
+
+      /* Decorative elements */
+      .decoration {
+        position: absolute;
+        opacity: 0.3;
+        pointer-events: none;
+      }
+
+      .palm-tree {
+        bottom: 10%;
+        left: 5%;
+        font-size: 30px;
+        color: #228b22;
+      }
+
+      .mountain {
+        top: 15%;
+        left: 20%;
+        font-size: 25px;
+        color: #696969;
+      }
+
+      .ship {
+        bottom: 20%;
+        right: 10%;
+        font-size: 25px;
+        color: #8b4513;
+      }
+
+      @media (max-width: 768px) {
         .checkpoint {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
+          width: 50px;
+          height: 50px;
         }
-        
-        .checkpoint:hover {
-            transform: scale(1.2);
-            filter: brightness(1.3);
-        }
-        
-        .checkpoint-icon {
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, #ff4444, #cc0000);
-            border: 4px solid #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: #fff;
-            text-shadow: 1px 1px 2px #000;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
+
         .checkpoint-label {
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: #ffd600;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 6px;
-            white-space: nowrap;
-            border: 2px solid #ffd600;
-            text-align: center;
+          font-size: 5px;
+          top: -35px;
         }
-        
-        .checkpoint-year {
-            font-size: 5px;
-            color: #fff;
-            margin-top: 2px;
+
+        .game-header h1 {
+          font-size: 12px;
         }
-        
-        .path {
-            position: absolute;
-            border: 3px dashed #8b4513;
-            opacity: 0.7;
-            z-index: 1;
+
+        .game-header p {
+          font-size: 6px;
         }
-        
+
         .compass {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 80px;
-            height: 80px;
-            background: rgba(139, 69, 19, 0.8);
-            border: 3px solid #ffd600;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #ffd600;
+          width: 60px;
+          height: 60px;
+          font-size: 10px;
         }
-        
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: #ffd600;
-            color: #000;
-            border: 2px solid #000;
-            border-radius: 8px;
-            padding: 10px 15px;
-            font-family: "Press Start 2P", cursive;
-            font-size: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            z-index: 100;
-        }
-        
-        .back-btn:hover {
-            background-color: #ffa000;
-            color: #000;
-            transform: translateY(-2px);
-        }
-        
-        .game-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .checkpoint {
-            font-size: 16px;
-            color: #000;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .hint-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .hint-icon:hover {
-            transform: scale(1.1);
-        }
-
-        .answer-box input {
-            border: 2px solid #ffd600;
-            border-radius: 5px;
-            font-family: "Press Start 2P", cursive;
-            font-size: 8px;
-        }
-
-        .answer-box input:focus {
-            outline: none;
-            border-color: #ffa000;
-            box-shadow: 0 0 10px rgba(255, 214, 0, 0.3);
-        }
-        
-        .modal-content {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 30px;
-            border: 3px solid #ffd600;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-        }
-        
-        .modal-content h2 {
-            font-size: 14px;
-            color: #000;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #ffd600;
-            padding-bottom: 10px;
-        }
-        
-        .modal-content p {
-            font-size: 8px;
-            color: #333;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
-        .game-options {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .game-btn {
-            background-color: #ffd600;
-            color: #000;
-            border: 2px solid #000;
-            border-radius: 8px;
-            padding: 12px 20px;
-            font-family: "Press Start 2P", cursive;
-            font-size: 7px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-        
-        .game-btn:hover {
-            background-color: #ffa000;
-            color: #000;
-            transform: translateY(-2px);
-        }
-        
-        .close-btn {
-            background-color: #ff4444;
-            color: #fff;
-        }
-        
-        .close-btn:hover {
-            background-color: #cc0000;
-            color: #fff;
-        }
-        
-        .no-sites-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: #ffd600;
-            padding: 30px;
-            border-radius: 15px;
-            border: 3px solid #ffd600;
-            text-align: center;
-            font-size: 12px;
-        }
-        
-        /* Decorative elements */
-        .decoration {
-            position: absolute;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        
-        .palm-tree {
-            bottom: 10%;
-            left: 5%;
-            font-size: 30px;
-            color: #228b22;
-        }
-        
-        .mountain {
-            top: 15%;
-            left: 20%;
-            font-size: 25px;
-            color: #696969;
-        }
-        
-        .ship {
-            bottom: 20%;
-            right: 10%;
-            font-size: 25px;
-            color: #8b4513;
-        }
-        
-        @media (max-width: 768px) {
-            .checkpoint {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .checkpoint-label {
-                font-size: 5px;
-                top: -35px;
-            }
-            
-            .game-header h1 {
-                font-size: 12px;
-            }
-            
-            .game-header p {
-                font-size: 6px;
-            }
-            
-            .compass {
-                width: 60px;
-                height: 60px;
-                font-size: 10px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="welcome.php">WARISAN DECODE</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav ms-auto">
-                    <a class="nav-link" href="welcome.php">Home</a>
-                    <a class="nav-link" href="maps-leaflet.html">Heritage Map</a>
-                    <a class="nav-link active" href="heritage-game.html">Heritage Quest</a>
-                    <a class="nav-link" href="profile.php">Profile</a>
-                    <a class="nav-link" href="logout.php">Logout</a>
-                </div>
-            </div>
+      <div class="container">
+        <a class="navbar-brand" href="welcome.php">WARISAN DECODE</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="welcome.php">Home</a>
+            <a class="nav-link" href="maps-leaflet.html">Heritage Map</a>
+            <a class="nav-link active" href="heritage-game.html"
+              >Heritage Quest</a
+            >
+            <a class="nav-link" href="profile.php">Profile</a>
+            <a class="nav-link" href="logout.php">Logout</a>
+          </div>
         </div>
+      </div>
     </nav>
 
     <div class="game-container">
-        <div class="treasure-map">
-            <!-- Back Button -->
-            <a href="maps-leaflet.html" class="back-btn">← BACK TO MAP</a>
-            
-            <!-- Debug Panel (top right) -->
-            <div style="position: absolute; top: 20px; right: 200px; background: rgba(0,0,0,0.7); color: #fff; padding: 10px; border-radius: 5px; font-size: 8px; z-index: 100;">
-                <div>Debug Panel</div>
-                <div id="debug-info">Unlocked: None</div>
-                <button onclick="clearProgress()" style="font-size: 6px; margin-top: 5px; padding: 2px 5px;">Clear Progress</button>
-                <button onclick="refreshGame()" style="font-size: 6px; margin-top: 2px; padding: 2px 5px;">Refresh</button>
-            </div>
-            
-            <!-- Game Header -->
-            <div class="game-header">
-                <h1 id="game-title">🗺️ HERITAGE QUEST</h1>
-                <p id="game-subtitle">Choose your checkpoint to begin the adventure!</p>
-            </div>
-            
-            <!-- Compass -->
-            <div class="compass">
-                <img src="imgs/compass.png" alt="Compass" style="width: 90%; height: 90%; object-fit: contain;">
-              </div>
-            
-            <!-- Dynamic checkpoints will be populated here -->
-            <div id="checkpoints-container">
-                <!-- Checkpoints will be generated by JavaScript -->
-            </div>
-            
-            <!-- Decorative Elements -->
-            <div class="decoration palm-tree">🌴</div>
-            <div class="decoration mountain">⛰️</div>
-            <div class="decoration ship">⛵</div>
+      <div class="treasure-map">
+        <!-- Back Button -->
+        <a href="maps-leaflet.html" class="back-btn">← BACK TO MAP</a>
+
+        <!-- Game Header -->
+        <div class="game-header">
+          <h1 id="game-title">🗺️ HERITAGE QUEST</h1>
+          <p id="game-subtitle">
+            Choose your checkpoint to begin the adventure!
+          </p>
         </div>
+
+        <!-- Compass -->
+        <div class="compass">
+          <img
+            src="imgs/compass.png"
+            alt="Compass"
+            style="width: 90%; height: 90%; object-fit: contain"
+          />
+        </div>
+
+        <!-- Dynamic checkpoints will be populated here -->
+        <div id="checkpoints-container">
+          <!-- Checkpoints will be generated by JavaScript -->
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="decoration palm-tree">🌴</div>
+        <div class="decoration mountain">⛰️</div>
+        <div class="decoration ship">⛵</div>
+      </div>
     </div>
 
     <!-- Game Modal -->
     <div id="gameModal" class="game-modal">
-        <div class="modal-content">
-            <h2 id="modalTitle">Heritage Site Challenge</h2>
-            <p id="modalDescription">Choose your adventure at this historic location!</p>
-            <div class="game-options">
-                <button class="game-btn" onclick="startTrivia()">📚 TRIVIA QUIZ</button>
-                <button class="game-btn" onclick="startPuzzle()">🧩 HISTORY PUZZLE</button>
-                <button class="game-btn" onclick="startExplore()">🔍 VIRTUAL TOUR</button>
-                <button class="game-btn close-btn" onclick="closeGameModal()">❌ CLOSE</button>
-            </div>
+      <div class="modal-content">
+        <h2 id="modalTitle">Heritage Site Challenge</h2>
+        <p id="modalDescription">
+          Choose your adventure at this historic location!
+        </p>
+        <div class="game-options">
+          <button class="game-btn" onclick="startGame()">📚 PLAY GAME</button>
+          <button class="game-btn close-btn" onclick="closeGameModal()">
+            ❌ CLOSE
+          </button>
         </div>
-    </div>
-
-    <!-- Checkpoint Modals -->
-    <!-- Checkpoint 1: Caesar Cipher Modal -->
-    <div id="checkpoint1Modal" class="game-modal">
-        <div class="modal-content">
-            <h2 class="checkpoint">Checkpoint 1: The Ciphered Fortress</h2>
-            <p><strong>🔐 Cipher Text:</strong><br>
-            Wklv iruw zdv exlow eb wkh Sruwxjxhvh</p>
-            <img src="imgs/lightbulb.png" alt="Hint" class="hint-icon" onclick="showHint(1)" style="width: 30px; height: 30px; cursor: pointer;" />
-            <p id="hint-text-1" style="display: none; font-size: 10px;">Use Caesar Cipher – shift letters 3 places back!<br> The secret lies in who built the fortress <br>Beginner Tip: <br>W → T<br> k → h<br> l → i<br> v → s<br> ...</p>
-            <div class="answer-box" style="margin: 20px 0;">
-                <input type="text" id="checkpoint1-answer" placeholder="Enter your answer here" style="width: 100%; padding: 10px; margin-bottom: 10px;" />
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button class="game-btn" onclick="checkCheckpointAnswer(1)">Submit</button>
-                    <button class="game-btn close-btn" onclick="closeCheckpointModal(1)">❌ CLOSE</button>
-                </div>
-                <p id="checkpoint1-feedback" style="margin-top: 10px;"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Checkpoint 2: Morse Code Modal -->
-    <div id="checkpoint2Modal" class="game-modal">
-        <div class="modal-content">
-            <h2 class="checkpoint">Checkpoint 2: The church bells that once rang over Melaka</h2>
-            <p><strong>Morse Code Puzzle</strong><br>
-             - .... . / -.-. .... ..- .-. -.-. .... / --- ..-. / .... --- .--. .</p>
-            <img src="imgs/lightbulb.png" alt="Hint" class="hint-icon" onclick="showHint(2)" style="width: 30px; height: 30px; cursor: pointer;" />
-            <p id="hint-text-2" style="display: none; font-size: 10px;">Decode this ancient bell message. Use the dots and dashes of Morse Code to uncover a phrase whispered since 1710.
-                <br><img src="imgs/Morsecode.png" alt="morsecode" style="max-width: 100%; margin-top: 10px;">
-            </p>
-            <div class="answer-box" style="margin: 20px 0;">
-                <input type="text" id="checkpoint2-answer" placeholder="Enter your answer here" style="width: 100%; padding: 10px; margin-bottom: 10px;" />
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button class="game-btn" onclick="checkCheckpointAnswer(2)">Submit</button>
-                    <button class="game-btn close-btn" onclick="closeCheckpointModal(2)">❌ CLOSE</button>
-                </div>
-                <p id="checkpoint2-feedback" style="margin-top: 10px;"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Checkpoint 3: Number Cipher Modal -->
-    <div id="checkpoint3Modal" class="game-modal">
-        <div class="modal-content">
-            <h2 class="checkpoint">Checkpoint 3</h2>
-            <p><strong>🔐 Cipher Text:</strong><br>
-                7-21-1-14 / 25-9-14</p>
-            <img src="imgs/lightbulb.png" alt="Hint" class="hint-icon" onclick="showHint(3)" style="width: 30px; height: 30px; cursor: pointer;" />
-            <p id="hint-text-3" style="display: none; font-size: 10px;">A divine presence watches over this temple<br>Convert the numbers to letters (A=1, B=2, ..., Z=26) to uncover who is worshipped here</p>
-            <div class="answer-box" style="margin: 20px 0;">
-                <input type="text" id="checkpoint3-answer" placeholder="Enter your answer here" style="width: 100%; padding: 10px; margin-bottom: 10px;" />
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button class="game-btn" onclick="checkCheckpointAnswer(3)">Submit</button>
-                    <button class="game-btn close-btn" onclick="closeCheckpointModal(3)">❌ CLOSE</button>
-                </div>
-                <p id="checkpoint3-feedback" style="margin-top: 10px;"></p>
-            </div>
-        </div>
+      </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
-        let currentCheckpoint = null;
-        let currentState = null;
+      let currentCheckpoint = null;
+      let currentState = null;
 
-        // Lock/Unlock System
-        function isHeritageUnlocked(siteId) {
-            // ID 1 is always unlocked (starting point)
-            if (siteId === 1) return true;
-            
-            const unlockedSites = JSON.parse(localStorage.getItem('unlockedHeritageSites') || '[]');
-            return unlockedSites.includes(siteId);
+      // Lock/Unlock System
+      function isHeritageUnlocked(siteId) {
+        // ID 1 is always unlocked (starting point)
+        if (siteId === 1) return true;
+
+        const unlockedSites = JSON.parse(
+          localStorage.getItem("unlockedHeritageSites") || "[]"
+        );
+        return unlockedSites.includes(siteId);
+      }
+
+      function unlockHeritage(siteId) {
+        const unlockedSites = JSON.parse(
+          localStorage.getItem("unlockedHeritageSites") || "[]"
+        );
+        if (!unlockedSites.includes(siteId)) {
+          unlockedSites.push(siteId);
+          localStorage.setItem(
+            "unlockedHeritageSites",
+            JSON.stringify(unlockedSites)
+          );
+
+          // Auto-unlock the next sequential site if it exists
+          const nextSiteId = siteId + 1;
+          const nextSite = heritageSites.find(
+            (site) => site.id === nextSiteId && site.state === currentState
+          );
+          if (nextSite && !unlockedSites.includes(nextSiteId)) {
+            // Don't auto-unlock, just make it available for play
+            console.log(
+              `Next site ${nextSite.name} is now available for unlocking!`
+            );
+          }
+
+          return true; // Return true if site was newly unlocked
+        }
+        return false; // Return false if already unlocked
+      }
+
+      function getDisplayInfo(site) {
+        const isUnlocked = isHeritageUnlocked(site.id);
+        const canPlay = canPlayGame(site.id);
+
+        if (isUnlocked) {
+          return {
+            name: site.name,
+            description: site.description,
+            details: site.details,
+            category: site.category,
+            icon: site.icon,
+            year: site.year,
+          };
+        } else if (canPlay) {
+          // Next site in sequence - still shows ??? but is playable
+          return {
+            name: "???",
+            description: "Locked Heritage Site",
+            details: "Complete this challenge to unlock",
+            category: "locked",
+            icon: "🔒",
+            year: "???",
+          };
+        } else {
+          // Completely locked sites
+          return {
+            name: "???",
+            description: "Locked Heritage Site",
+            details: "Complete previous sites first",
+            category: "locked",
+            icon: "🔒",
+            year: "???",
+          };
+        }
+      }
+
+      // Heritage sites data
+      const heritageSites = [
+        {
+          id: 1,
+          name: "Fort A Famosa",
+          lat: 2.1896,
+          lng: 102.2501,
+          category: "historical",
+          state: "Melaka",
+          description:
+            "Historic Portuguese fortress and military defense structure",
+          details:
+            "Built in 1511 by Portuguese conquistador Alfonso de Albuquerque, only Porta de Santiago gate remains today",
+          icon: "🏰",
+          year: "1511",
+          position: { top: "40%", left: "20%" },
+        },
+        {
+          id: 2,
+          name: "St. Peter's Church",
+          lat: 2.1889,
+          lng: 102.2533,
+          category: "religious",
+          state: "Melaka",
+          description: "Oldest functioning Catholic church in Malaysia",
+          details:
+            "Built in 1710 by Dutch descendants of Portuguese settlers, features unique blend of Eastern and Western architecture",
+          icon: "⛪",
+          year: "1710",
+          position: { top: "70%", left: "50%" },
+        },
+        {
+          id: 3,
+          name: "Cheng Hoon Teng Temple",
+          lat: 2.1967,
+          lng: 102.2431,
+          category: "religious",
+          state: "Melaka",
+          description: "Malaysia's oldest traditional Chinese temple",
+          details:
+            "Built in 1673 by Chinese Captain Lee Wei King, dedicated to Goddess of Mercy Kuan Yin, features intricate woodwork without nails",
+          icon: "🏮",
+          year: "1673",
+          position: { top: "35%", left: "80%" },
+        },
+        {
+          id: 6,
+          name: "Petronas Twin Towers",
+          lat: 3.1579,
+          lng: 101.7121,
+          category: "cultural",
+          state: "Kuala Lumpur",
+          description: "Iconic twin skyscrapers and symbol of modern Malaysia",
+          details:
+            "Built in 1998, these towers represent Malaysia's economic progress",
+          icon: "🏢",
+          year: "1998",
+          position: { top: "40%", left: "30%" },
+        },
+        {
+          id: 7,
+          name: "National Museum of Malaysia",
+          lat: 3.1412,
+          lng: 101.6865,
+          category: "cultural",
+          state: "Kuala Lumpur",
+          description:
+            "Premier museum showcasing Malaysian history and culture",
+          details:
+            "Established in 1963, houses artifacts from prehistoric times",
+          icon: "🏛️",
+          year: "1963",
+          position: { top: "60%", left: "60%" },
+        },
+        {
+          id: 8,
+          name: "George Town UNESCO World Heritage Site",
+          lat: 5.4164,
+          lng: 100.3327,
+          category: "historical",
+          state: "Penang",
+          description:
+            "Historic city with colonial architecture and street art",
+          details: "UNESCO World Heritage Site since 2008",
+          icon: "🏘️",
+          year: "2008",
+          position: { top: "35%", left: "45%" },
+        },
+      ];
+
+      function getURLParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+      }
+
+      function initializeGame() {
+        currentState = getURLParameter("state");
+
+        if (!currentState) {
+          // Default to Melaka if no state specified
+          currentState = "Melaka";
         }
 
-        function unlockHeritage(siteId) {
-            const unlockedSites = JSON.parse(localStorage.getItem('unlockedHeritageSites') || '[]');
-            if (!unlockedSites.includes(siteId)) {
-                unlockedSites.push(siteId);
-                localStorage.setItem('unlockedHeritageSites', JSON.stringify(unlockedSites));
-                
-                // Auto-unlock the next sequential site if it exists
-                const nextSiteId = siteId + 1;
-                const nextSite = heritageSites.find(site => site.id === nextSiteId && site.state === currentState);
-                if (nextSite && !unlockedSites.includes(nextSiteId)) {
-                    // Don't auto-unlock, just make it available for play
-                    console.log(`Next site ${nextSite.name} is now available for unlocking!`);
-                }
-                
-                return true; // Return true if site was newly unlocked
-            }
-            return false; // Return false if already unlocked
+        // Update page title and header
+        document.getElementById(
+          "page-title"
+        ).textContent = `${currentState} Heritage Quest - Warisan Decode`;
+        document.getElementById(
+          "game-title"
+        ).textContent = `🗺️ ${currentState.toUpperCase()} HERITAGE QUEST`;
+
+        // Filter heritage sites for current state and calculate progress
+        const stateSites = heritageSites.filter(
+          (site) => site.state === currentState
+        );
+
+        if (stateSites.length === 0) {
+          showNoSitesMessage();
+          return;
         }
 
-        function getDisplayInfo(site) {
-            const isUnlocked = isHeritageUnlocked(site.id);
-            const canPlay = canPlayGame(site.id);
-            
-            if (isUnlocked) {
-                return {
-                    name: site.name,
-                    description: site.description,
-                    details: site.details,
-                    category: site.category,
-                    icon: site.icon,
-                    year: site.year
-                };
-            } else if (canPlay) {
-                // Next site in sequence - still shows ??? but is playable
-                return {
-                    name: "???",
-                    description: "Locked Heritage Site",
-                    details: "Complete this challenge to unlock",
-                    category: "locked",
-                    icon: "🔒",
-                    year: "???"
-                };
-            } else {
-                // Completely locked sites
-                return {
-                    name: "???",
-                    description: "Locked Heritage Site",
-                    details: "Complete previous sites first",
-                    category: "locked",
-                    icon: "🔒",
-                    year: "???"
-                };
-            }
-        }
-        
-        // Heritage sites data
-        const heritageSites = [
-            {
-                id: 1,
-                name: "Fort A Famosa",
-                lat: 2.1896,
-                lng: 102.2501,
-                category: "historical",
-                state: "Melaka",
-                description: "Historic Portuguese fortress and military defense structure",
-                details: "Built in 1511 by Portuguese conquistador Alfonso de Albuquerque, only Porta de Santiago gate remains today",
-                icon: "🏰",
-                year: "1511",
-                position: { top: "50%", left: "20%" }
-            },
-            {
-                id: 2,
-                name: "St. Peter's Church",
-                lat: 2.1889,
-                lng: 102.2533,
-                category: "religious",
-                state: "Melaka",
-                description: "Oldest functioning Catholic church in Malaysia",
-                details: "Built in 1710 by Dutch descendants of Portuguese settlers, features unique blend of Eastern and Western architecture",
-                icon: "⛪",
-                year: "1710",
-                position: { top: "70%", left: "50%" }
-            },
-            {
-                id: 3,
-                name: "St. Paul's Church",
-                lat: 2.1898,
-                lng: 102.2502,
-                category: "historical",
-                state: "Melaka",
-                description: "Ruined Portuguese church on St. Paul's Hill",
-                details: "Built in 1521, originally called Our Lady of the Hill, where St. Francis Xavier was temporarily entombed",
-                icon: "🏛️",
-                year: "1521",
-                position: { top: "30%", left: "85%" }
-            },
-            // {
-            //     id: 4,
-            //     name: "Cheng Hoon Teng Temple",
-            //     lat: 2.1967,
-            //     lng: 102.2431,
-            //     category: "religious",
-            //     state: "Melaka",
-            //     description: "Malaysia's oldest traditional Chinese temple",
-            //     details: "Built in 1673 by Chinese Captain Lee Wei King, dedicated to Goddess of Mercy Kuan Yin, features intricate woodwork without nails",
-            //     icon: "🏮",
-            //     year: "1645",
-            //     position: { top: "60%", left: "70%" }
-            // },
-            // {
-            //     id: 5,
-            //     name: "Sri Poyyatha Vinayagar Moorthi Temple",
-            //     lat: 2.1956,
-            //     lng: 102.2478,
-            //     category: "religious",
-            //     state: "Melaka",
-            //     description: "Oldest Hindu temple in Malaysia",
-            //     details: "Built in 1781, dedicated to Lord Vinayagar (Ganesha), showcases South Indian Dravidian architecture and Tamil culture",
-            //     icon: "🕉️",
-            //     year: "1781",
-            //     position: { top: "40%", left: "90%" }
-            // },
-            // Add more states' heritage sites here...
-            {
-                id: 4,
-                name: "Petronas Twin Towers",
-                lat: 3.1579,
-                lng: 101.7121,
-                category: "cultural",
-                state: "Kuala Lumpur",
-                description: "Iconic twin skyscrapers and symbol of modern Malaysia",
-                details: "Built in 1998, these towers represent Malaysia's economic progress",
-                icon: "🏢",
-                year: "1998",
-                position: { top: "40%", left: "30%" }
-            },
-            {
-                id: 5,
-                name: "National Museum of Malaysia",
-                lat: 3.1412,
-                lng: 101.6865,
-                category: "cultural",
-                state: "Kuala Lumpur",
-                description: "Premier museum showcasing Malaysian history and culture",
-                details: "Established in 1963, houses artifacts from prehistoric times",
-                icon: "🏛️",
-                year: "1963",
-                position: { top: "60%", left: "60%" }
-            },
-            {
-                id: 6,
-                name: "George Town UNESCO World Heritage Site",
-                lat: 5.4164,
-                lng: 100.3327,
-                category: "historical",
-                state: "Penang",
-                description: "Historic city with colonial architecture and street art",
-                details: "UNESCO World Heritage Site since 2008",
-                icon: "🏘️",
-                year: "2008",
-                position: { top: "35%", left: "45%" }
-            }
-        ];
+        // Calculate progress
+        const unlockedCount = stateSites.filter((site) =>
+          isHeritageUnlocked(site.id)
+        ).length;
+        const totalCount = stateSites.length;
+        document.getElementById(
+          "game-subtitle"
+        ).textContent = `Progress: ${unlockedCount}/${totalCount} sites unlocked • Start with ID 1 and unlock in sequence!`;
 
-        function getURLParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
+        // Generate checkpoints
+        generateCheckpoints(stateSites);
+        generatePaths(stateSites);
+      }
 
-        function initializeGame() {
-            currentState = getURLParameter('state');
-            
-            if (!currentState) {
-                // Default to Melaka if no state specified
-                currentState = 'Melaka';
-            }
-
-            // Update page title and header
-            document.getElementById('page-title').textContent = `${currentState} Heritage Quest - Warisan Decode`;
-            document.getElementById('game-title').textContent = `🗺️ ${currentState.toUpperCase()} HERITAGE QUEST`;
-            
-            // Filter heritage sites for current state and calculate progress
-            const stateSites = heritageSites.filter(site => site.state === currentState);
-            
-            if (stateSites.length === 0) {
-                showNoSitesMessage();
-                return;
-            }
-
-            // Calculate progress
-            const unlockedCount = stateSites.filter(site => isHeritageUnlocked(site.id)).length;
-            const totalCount = stateSites.length;
-            document.getElementById('game-subtitle').textContent = `Progress: ${unlockedCount}/${totalCount} sites unlocked • Start with ID 1 and unlock in sequence!`;
-
-            // Generate checkpoints
-            generateCheckpoints(stateSites);
-            generatePaths(stateSites);
-            
-            // Update debug info
-            updateDebugInfo();
-        }
-
-        function showNoSitesMessage() {
-            const container = document.getElementById('checkpoints-container');
-            container.innerHTML = `
+      function showNoSitesMessage() {
+        const container = document.getElementById("checkpoints-container");
+        container.innerHTML = `
                 <div class="no-sites-message">
                     <h3>🚧 Coming Soon!</h3>
                     <p>Heritage quest for ${currentState} is under development.</p>
@@ -692,453 +615,204 @@
                     <a href="maps-leaflet.html" class="game-btn">← BACK TO MAP</a>
                 </div>
             `;
-        }
+      }
 
-        function generateCheckpoints(sites) {
-            const container = document.getElementById('checkpoints-container');
-            container.innerHTML = '';
+      function generateCheckpoints(sites) {
+        const container = document.getElementById("checkpoints-container");
+        container.innerHTML = "";
 
-            sites.forEach((site, index) => {
-                const displayInfo = getDisplayInfo(site);
-                const isUnlocked = isHeritageUnlocked(site.id);
-                const canPlay = canPlayGame(site.id);
-                
-                const checkpoint = document.createElement('div');
-                checkpoint.className = 'checkpoint';
-                checkpoint.style.top = site.position.top;
-                checkpoint.style.left = site.position.left;
-                checkpoint.setAttribute('onclick', `openGameModal('${site.id}')`);
-                
-                // Different visual states:
-                // - Unlocked: Red/bright
-                // - Can play (next in sequence): Orange/medium
-                // - Locked (can't play yet): Gray/dim
-                let background, opacity;
-                if (isUnlocked) {
-                    background = 'radial-gradient(circle, #ff4444, #cc0000)';
-                    opacity = '1';
-                } else if (canPlay) {
-                    background = 'radial-gradient(circle, #ffa500, #ff8c00)';
-                    opacity = '0.9';
-                } else {
-                    background = 'radial-gradient(circle, #666666, #333333)';
-                    opacity = '0.5';
-                }
-                
-                checkpoint.innerHTML = `
+        sites.forEach((site, index) => {
+          const displayInfo = getDisplayInfo(site);
+          const isUnlocked = isHeritageUnlocked(site.id);
+          const canPlay = canPlayGame(site.id);
+
+          const checkpoint = document.createElement("div");
+          checkpoint.className = "checkpoint";
+          checkpoint.style.top = site.position.top;
+          checkpoint.style.left = site.position.left;
+          checkpoint.setAttribute("onclick", `openGameModal('${site.id}')`);
+
+          // Different visual states:
+          // - Unlocked: Red/bright
+          // - Can play (next in sequence): Orange/medium
+          // - Locked (can't play yet): Gray/dim
+          let background, opacity;
+          if (isUnlocked) {
+            background = "radial-gradient(circle, #ff4444, #cc0000)";
+            opacity = "1";
+          } else if (canPlay) {
+            background = "radial-gradient(circle, #ffa500, #ff8c00)";
+            opacity = "0.9";
+          } else {
+            background = "radial-gradient(circle, #666666, #333333)";
+            opacity = "0.5";
+          }
+
+          checkpoint.innerHTML = `
                     <div class="checkpoint-icon" style="background: ${background}; opacity: ${opacity};">${displayInfo.icon}</div>
                     <div class="checkpoint-label">
                         ${displayInfo.name}
                         <div class="checkpoint-year">(${displayInfo.year})</div>
                     </div>
                 `;
-                
-                container.appendChild(checkpoint);
-            });
+
+          container.appendChild(checkpoint);
+        });
+      }
+
+      function generatePaths(sites) {
+        // Generate connecting paths between consecutive checkpoints
+        for (let i = 0; i < sites.length - 1; i++) {
+          const currentSite = sites[i];
+          const nextSite = sites[i + 1];
+
+          // Parse position percentages and convert to viewport coordinates
+          const x1 = parseFloat(currentSite.position.left);
+          const y1 = parseFloat(currentSite.position.top);
+          const x2 = parseFloat(nextSite.position.left);
+          const y2 = parseFloat(nextSite.position.top);
+
+          // Calculate distance between checkpoint centers
+          const deltaX = x2 - x1;
+          const deltaY = y2 - y1;
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+          // Calculate angle in degrees
+          const angleRad = Math.atan2(deltaY, deltaX);
+          const angleDeg = angleRad * (180 / Math.PI);
+
+          // Adjust starting position to account for checkpoint radius (30px = ~3% of typical screen)
+          const checkpointRadius = 3; // Approximate percentage
+          const startX = x1 + checkpointRadius * Math.cos(angleRad);
+          const startY = y1 + checkpointRadius * Math.sin(angleRad);
+
+          // Adjust path length to account for both checkpoint radii
+          const pathLength = distance - checkpointRadius * 2;
+
+          // Create path element
+          const path = document.createElement("div");
+          path.className = "path";
+          path.style.position = "absolute";
+          path.style.left = `${startX}%`;
+          path.style.top = `${startY}%`;
+          path.style.width = `${pathLength * 0.8}%`; // Scale factor for screen percentage
+          path.style.height = "0";
+          path.style.border = "3px dashed #8b4513";
+          path.style.borderTop = "3px dashed #8b4513";
+          path.style.transformOrigin = "left center";
+          path.style.transform = `rotate(${angleDeg}deg)`;
+          path.style.opacity = "0.7";
+          path.style.zIndex = "1";
+
+          document.getElementById("checkpoints-container").appendChild(path);
+        }
+      }
+
+      function canPlayGame(siteId) {
+        // Can play if already unlocked
+        if (isHeritageUnlocked(siteId)) return true;
+
+        // Can play if it's the next site in sequence
+        const unlockedSites = JSON.parse(
+          localStorage.getItem("unlockedHeritageSites") || "[]"
+        );
+        const stateSites = heritageSites
+          .filter((site) => site.state === currentState)
+          .sort((a, b) => a.id - b.id);
+
+        // Find the highest unlocked ID in this state
+        let highestUnlocked = 1; // Start with ID 1 (always unlocked)
+        for (let site of stateSites) {
+          if (isHeritageUnlocked(site.id)) {
+            highestUnlocked = site.id;
+          }
         }
 
-        function generatePaths(sites) {
-            // Generate connecting paths between consecutive checkpoints
-            for (let i = 0; i < sites.length - 1; i++) {
-                const currentSite = sites[i];
-                const nextSite = sites[i + 1];
-                
-                // Parse position percentages and convert to viewport coordinates
-                const x1 = parseFloat(currentSite.position.left);
-                const y1 = parseFloat(currentSite.position.top);
-                const x2 = parseFloat(nextSite.position.left);
-                const y2 = parseFloat(nextSite.position.top);
-                
-                // Calculate distance between checkpoint centers
-                const deltaX = x2 - x1;
-                const deltaY = y2 - y1;
-                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                
-                // Calculate angle in degrees
-                const angleRad = Math.atan2(deltaY, deltaX);
-                const angleDeg = angleRad * (180 / Math.PI);
-                
-                // Adjust starting position to account for checkpoint radius (30px = ~3% of typical screen)
-                const checkpointRadius = 3; // Approximate percentage
-                const startX = x1 + (checkpointRadius * Math.cos(angleRad));
-                const startY = y1 + (checkpointRadius * Math.sin(angleRad));
-                
-                // Adjust path length to account for both checkpoint radii
-                const pathLength = distance - (checkpointRadius * 2);
-                
-                // Create path element
-                const path = document.createElement('div');
-                path.className = 'path';
-                path.style.position = 'absolute';
-                path.style.left = `${startX}%`;
-                path.style.top = `${startY}%`;
-                path.style.width = `${pathLength * 0.8}%`; // Scale factor for screen percentage
-                path.style.height = '0';
-                path.style.border = '3px dashed #8b4513';
-                path.style.borderTop = '3px dashed #8b4513';
-                path.style.transformOrigin = 'left center';
-                path.style.transform = `rotate(${angleDeg}deg)`;
-                path.style.opacity = '0.7';
-                path.style.zIndex = '1';
-                
-                document.getElementById('checkpoints-container').appendChild(path);
-            }
+        // Can play if this is the next site after the highest unlocked
+        return siteId === highestUnlocked + 1;
+      }
+
+      function openGameModal(siteId) {
+        currentCheckpoint = siteId;
+        const site = heritageSites.find((s) => s.id == siteId);
+
+        if (!site) return;
+
+        const displayInfo = getDisplayInfo(site);
+        const isUnlocked = isHeritageUnlocked(site.id);
+        const canPlay = canPlayGame(siteId);
+
+        document.getElementById(
+          "modalTitle"
+        ).innerHTML = `${displayInfo.icon} ${displayInfo.name}`;
+
+        if (isUnlocked) {
+          document.getElementById(
+            "modalDescription"
+          ).textContent = `Replay games and test your knowledge about this ${site.category} heritage site! Learn about its history, architecture, and cultural significance in ${site.state}.`;
+        } else if (canPlay) {
+          document.getElementById(
+            "modalDescription"
+          ).textContent = `Complete challenges to unlock this heritage site and learn about its fascinating history in ${site.state}.`;
+        } else {
+          document.getElementById(
+            "modalDescription"
+          ).textContent = `This heritage site is locked. Complete the previous heritage sites first to unlock this one!`;
         }
 
-        function canPlayGame(siteId) {
-            // Can play if already unlocked
-            if (isHeritageUnlocked(siteId)) {
-                console.log(`Site ${siteId}: Already unlocked - can play`);
-                return true;
-            }
-            
-            // Can play if it's the next site in sequence
-            const stateSites = heritageSites.filter(site => site.state === currentState).sort((a, b) => a.id - b.id);
-            const unlockedSites = JSON.parse(localStorage.getItem('unlockedHeritageSites') || '[]');
-            
-            // Find the highest unlocked ID in this state
-            let highestUnlocked = 0; // Start with 0
-            
-            // Since ID 1 is always unlocked, start from there
-            if (isHeritageUnlocked(1)) {
-                highestUnlocked = 1;
-            }
-            
-            // Check all unlocked sites in current state
-            for (let site of stateSites) {
-                if (isHeritageUnlocked(site.id) && site.id > highestUnlocked) {
-                    highestUnlocked = site.id;
-                }
-            }
-            
-            const nextPlayable = highestUnlocked + 1;
-            const canPlay = siteId === nextPlayable;
-            
-            // Enhanced debug logging
-            console.log(`Site ${siteId} check:`);
-            console.log(`- Current state: ${currentState}`);
-            console.log(`- Unlocked sites: [${unlockedSites.join(', ')}]`);
-            console.log(`- State sites: [${stateSites.map(s => s.id).join(', ')}]`);
-            console.log(`- Highest unlocked: ${highestUnlocked}`);
-            console.log(`- Next playable should be: ${nextPlayable}`);
-            console.log(`- Can play site ${siteId}: ${canPlay}`);
-            
-            // Can play if this is the next site after the highest unlocked
-            return canPlay;
+        // Show game buttons for unlocked sites (replay) OR next playable site (unlock)
+        const gameButtons = document.querySelectorAll(
+          ".game-btn:not(.close-btn)"
+        );
+        gameButtons.forEach((btn) => {
+          btn.style.display = isUnlocked || canPlay ? "inline-block" : "none";
+        });
+
+        document.getElementById("gameModal").style.display = "flex";
+      }
+
+      function closeGameModal() {
+        document.getElementById("gameModal").style.display = "none";
+        currentCheckpoint = null;
+      }
+
+      function startGame() {
+        const site = heritageSites.find((s) => s.id == currentCheckpoint);
+        const isUnlocked = isHeritageUnlocked(site.id);
+        const canPlay = canPlayGame(site.id);
+
+        if (!canPlay && !isUnlocked) {
+          alert(
+            `🔒 This heritage site is locked! Complete the previous sites first.`
+          );
+          closeGameModal();
+          return;
         }
 
-        function openGameModal(siteId) {
-            currentCheckpoint = siteId;
-            const site = heritageSites.find(s => s.id == siteId);
-            
-            if (!site) return;
-            
-            const displayInfo = getDisplayInfo(site);
-            const isUnlocked = isHeritageUnlocked(site.id);
-            const canPlay = canPlayGame(siteId);
-            
-            // For Melaka sites (IDs 1-3), open specific checkpoint modals
-            if (site.state === 'Melaka' && siteId >= 1 && siteId <= 3) {
-                if (isUnlocked || canPlay) {
-                    // Update debug info before opening modal
-                    updateDebugInfo();
-                    
-                    // Open specific checkpoint modal
-                    document.getElementById(`checkpoint${siteId}Modal`).style.display = 'flex';
-                    return;
-                } else {
-                    // Force debug update to see current status
-                    updateDebugInfo();
-                    console.log(`Checkpoint ${siteId} clicked but not playable:`);
-                    console.log(`- Is unlocked: ${isUnlocked}`);
-                    console.log(`- Can play: ${canPlay}`);
-                }
-            }
-            
-            // For other sites or locked sites, show regular game modal
-            document.getElementById('modalTitle').innerHTML = `${displayInfo.icon} ${displayInfo.name}`;
-            
-            if (isUnlocked) {
-                document.getElementById('modalDescription').textContent = `Replay games for this ${site.category} heritage site! Test your knowledge about its history, architecture, and cultural significance in ${site.state}.`;
-            } else if (canPlay) {
-                document.getElementById('modalDescription').textContent = `Complete challenges to unlock this heritage site and learn about its fascinating history in ${site.state}.`;
-            } else {
-                document.getElementById('modalDescription').textContent = `This heritage site is locked. Complete the previous heritage sites first to unlock this one!`;
-            }
-            
-            // Show game buttons for unlocked sites (replay) and next playable site (unlock)
-            const gameButtons = document.querySelectorAll('.game-btn:not(.close-btn)');
-            gameButtons.forEach(btn => {
-                btn.style.display = (isUnlocked || canPlay) ? 'inline-block' : 'none';
-            });
-            
-            document.getElementById('gameModal').style.display = 'flex';
-        }
+        // Navigate to the appropriate checkpoint page
+        const checkpointFile = `checkpoint${site.id}.html`;
+        window.location.href = checkpointFile;
+      }
 
-        function closeGameModal() {
-            document.getElementById('gameModal').style.display = 'none';
-            currentCheckpoint = null;
-        }
-
-        function startTrivia() {
-            const site = heritageSites.find(s => s.id == currentCheckpoint);
-            const isUnlocked = isHeritageUnlocked(site.id);
-            const canPlay = canPlayGame(site.id);
-            
-            if (!canPlay && !isUnlocked) {
-                alert(`🔒 This heritage site is locked! Complete the previous sites first.`);
-                closeGameModal();
-                return;
-            }
-            
-            if (isUnlocked) {
-                // Replay mode for unlocked sites
-                alert(`🎯 Replaying Trivia Quiz for ${site.name}!\n\nComing Soon: Interactive quiz about this heritage site's history, architecture, and cultural significance!\n\n(This is replay mode - site is already unlocked)`);
-            } else {
-                // Unlock mode for the next site in sequence
-                const completed = confirm(`🎯 Trivia Challenge: Mysterious Heritage Site\n\nQuestion: This heritage site was built in ${site.year}. True or False?\n\nClick OK for True, Cancel for False.`);
-                
-                if (completed) {
-                    const wasUnlocked = unlockHeritage(site.id);
-                    if (wasUnlocked) {
-                        alert(`🎉 Congratulations! You've unlocked ${site.name}!\n\nYou can now see its full details and history.`);
-                        // Refresh the display to show unlocked status
-                        const stateSites = heritageSites.filter(s => s.state === currentState);
-                        
-                        // Update progress counter
-                        const unlockedCount = stateSites.filter(site => isHeritageUnlocked(site.id)).length;
-                        const totalCount = stateSites.length;
-                        document.getElementById('game-subtitle').textContent = `Progress: ${unlockedCount}/${totalCount} sites unlocked • Start with ID 1 and unlock in sequence!`;
-                        
-                        generateCheckpoints(stateSites);
-                        generatePaths(stateSites);
-                    }
-                } else {
-                    alert(`❌ Not quite right. Try again to unlock this heritage site!`);
-                }
-            }
+      // Event listeners
+      document
+        .getElementById("gameModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
             closeGameModal();
-        }
-
-        function startPuzzle() {
-            const site = heritageSites.find(s => s.id == currentCheckpoint);
-            const isUnlocked = isHeritageUnlocked(site.id);
-            const canPlay = canPlayGame(site.id);
-            
-            if (!canPlay && !isUnlocked) {
-                alert(`🔒 This heritage site is locked! Complete the previous sites first.`);
-                closeGameModal();
-                return;
-            }
-            
-            if (isUnlocked) {
-                // Replay mode for unlocked sites
-                alert(`🧩 Replaying History Puzzle for ${site.name}!\n\nComing Soon: Solve puzzles to reconstruct historical events and architectural elements!\n\n(This is replay mode - site is already unlocked)`);
-            } else {
-                // Unlock mode for the next site in sequence
-                const answer = prompt(`🧩 History Puzzle: Mysterious Heritage Site\n\nWhat state is this heritage site located in?`);
-                
-                if (answer && answer.toLowerCase() === site.state.toLowerCase()) {
-                    const wasUnlocked = unlockHeritage(site.id);
-                    if (wasUnlocked) {
-                        alert(`🎉 Congratulations! You've unlocked ${site.name}!\n\nYou can now see its full details and history.`);
-                        // Refresh the display to show unlocked status
-                        const stateSites = heritageSites.filter(s => s.state === currentState);
-                        
-                        // Update progress counter
-                        const unlockedCount = stateSites.filter(site => isHeritageUnlocked(site.id)).length;
-                        const totalCount = stateSites.length;
-                        document.getElementById('game-subtitle').textContent = `Progress: ${unlockedCount}/${totalCount} sites unlocked • Start with ID 1 and unlock in sequence!`;
-                        
-                        generateCheckpoints(stateSites);
-                        generatePaths(stateSites);
-                    }
-                } else {
-                    alert(`❌ Not quite right. The correct answer is ${site.state}. Try again to unlock this heritage site!`);
-                }
-            }
-            closeGameModal();
-        }
-
-        function startExplore() {
-            const site = heritageSites.find(s => s.id == currentCheckpoint);
-            const isUnlocked = isHeritageUnlocked(site.id);
-            const canPlay = canPlayGame(site.id);
-            
-            if (!canPlay && !isUnlocked) {
-                alert(`🔒 This heritage site is locked! Complete the previous sites first.`);
-                closeGameModal();
-                return;
-            }
-            
-            if (isUnlocked) {
-                // Replay mode for unlocked sites
-                alert(`🔍 Replaying Virtual Tour of ${site.name}!\n\nComing Soon: Immersive 360° virtual exploration with historical narration!\n\n(This is replay mode - site is already unlocked)`);
-            } else {
-                // Unlock mode for the next site in sequence
-                const completed = confirm(`🔍 Virtual Exploration Challenge!\n\nExplore this mysterious heritage site and discover its secrets. Click OK when you're ready to unlock it!`);
-                
-                if (completed) {
-                    const wasUnlocked = unlockHeritage(site.id);
-                    if (wasUnlocked) {
-                        alert(`🎉 Congratulations! You've unlocked ${site.name}!\n\nYou can now see its full details and history.`);
-                        // Refresh the display to show unlocked status
-                        const stateSites = heritageSites.filter(s => s.state === currentState);
-                        
-                        // Update progress counter
-                        const unlockedCount = stateSites.filter(site => isHeritageUnlocked(site.id)).length;
-                        const totalCount = stateSites.length;
-                        document.getElementById('game-subtitle').textContent = `Progress: ${unlockedCount}/${totalCount} sites unlocked • Start with ID 1 and unlock in sequence!`;
-                        
-                        generateCheckpoints(stateSites);
-                        generatePaths(stateSites);
-                    }
-                }
-            }
-            closeGameModal();
-        }
-
-        // Event listeners
-        document.getElementById('gameModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeGameModal();
-            }
+          }
         });
 
-        // Event listeners for checkpoint modals
-        document.getElementById('checkpoint1Modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeCheckpointModal(1);
-            }
-        });
-
-        document.getElementById('checkpoint2Modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeCheckpointModal(2);
-            }
-        });
-
-        document.getElementById('checkpoint3Modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeCheckpointModal(3);
-            }
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeGameModal();
-                closeCheckpointModal(1);
-                closeCheckpointModal(2);
-                closeCheckpointModal(3);
-            }
-        });
-
-        // Checkpoint-specific functions
-        function showHint(checkpointNum) {
-            const hint = document.getElementById(`hint-text-${checkpointNum}`);
-            hint.style.display = hint.style.display === 'none' ? 'block' : 'none';
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeGameModal();
         }
+      });
 
-        function closeCheckpointModal(checkpointNum) {
-            document.getElementById(`checkpoint${checkpointNum}Modal`).style.display = 'none';
-            currentCheckpoint = null;
-        }
-
-        function checkCheckpointAnswer(checkpointNum) {
-            const userInput = document.getElementById(`checkpoint${checkpointNum}-answer`).value.trim().toLowerCase();
-            const feedback = document.getElementById(`checkpoint${checkpointNum}-feedback`);
-            
-            let correctAnswers = [];
-            let site = heritageSites.find(s => s.id === checkpointNum);
-            
-            switch(checkpointNum) {
-                case 1:
-                    correctAnswers = ['the portuguese'];
-                    break;
-                case 2:
-                    correctAnswers = ['church of hope', 'the church of hope'];
-                    break;
-                case 3:
-                    correctAnswers = ['guan yin'];
-                    break;
-            }
-            
-            if (correctAnswers.includes(userInput)) {
-                feedback.textContent = "✅ Correct! Heritage site unlocked!";
-                feedback.style.color = "green";
-                
-                // Unlock the heritage site
-                const wasUnlocked = unlockHeritage(checkpointNum);
-                if (wasUnlocked) {
-                    setTimeout(() => {
-                        closeCheckpointModal(checkpointNum);
-                        
-                        // Refresh the display to show unlocked status
-                        const stateSites = heritageSites.filter(s => s.state === currentState);
-                        
-                        // Update progress counter
-                        const unlockedCount = stateSites.filter(site => isHeritageUnlocked(site.id)).length;
-                        const totalCount = stateSites.length;
-                        document.getElementById('game-subtitle').textContent = `Progress: ${unlockedCount}/${totalCount} sites unlocked • Start with ID 1 and unlock in sequence!`;
-                        
-                        generateCheckpoints(stateSites);
-                        generatePaths(stateSites);
-                        
-                        // Update debug info
-                        updateDebugInfo();
-                        
-                        alert(`🎉 Congratulations! You've unlocked ${site.name}!\n\nYou can now see its full details and history.`);
-                    }, 1500);
-                }
-            } else {
-                feedback.textContent = "❌ Try again!";
-                feedback.style.color = "red";
-            }
-        }
-
-        // Debug function to clear progress (for testing)
-        function clearProgress() {
-            localStorage.removeItem('unlockedHeritageSites');
-            location.reload();
-        }
-
-        // Refresh game display
-        function refreshGame() {
-            const stateSites = heritageSites.filter(s => s.state === currentState);
-            generateCheckpoints(stateSites);
-            generatePaths(stateSites);
-            updateDebugInfo();
-            
-            // Also update progress counter
-            const unlockedCount = stateSites.filter(site => isHeritageUnlocked(site.id)).length;
-            const totalCount = stateSites.length;
-            document.getElementById('game-subtitle').textContent = `Progress: ${unlockedCount}/${totalCount} sites unlocked • Start with ID 1 and unlock in sequence!`;
-        }
-
-        // Update debug info
-        function updateDebugInfo() {
-            const unlockedSites = JSON.parse(localStorage.getItem('unlockedHeritageSites') || '[]');
-            const debugElement = document.getElementById('debug-info');
-            if (debugElement && currentState) {
-                const stateSites = heritageSites.filter(site => site.state === currentState);
-                const playableInfo = stateSites.map(site => {
-                    const unlocked = isHeritageUnlocked(site.id);
-                    const canPlay = canPlayGame(site.id);
-                    return `${site.id}:${unlocked ? 'U' : (canPlay ? 'P' : 'L')}`;
-                }).join(' ');
-                
-                debugElement.innerHTML = `
-                    <div>Unlocked: [${unlockedSites.join(', ')}]</div>
-                    <div style="font-size: 6px;">U=Unlocked, P=Playable, L=Locked</div>
-                    <div>${playableInfo}</div>
-                `;
-            }
-        }
-
-        // Initialize game when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeGame();
-        });
+      // Initialize game when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeGame();
+      });
     </script>
-</body>
-</html> 
+  </body>
+</html>

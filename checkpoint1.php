@@ -25,9 +25,9 @@ if ($result->num_rows == 0) {
     $stmtInsert = $conn->prepare($sqlInsert);
     $stmtInsert->bind_param("is", $userId, $badgeName);
     $stmtInsert->execute();
-
-    echo "<p>🎉 Congratulations! You have earned the <strong>'$badgeName'</strong> badge.</p>";
+    
+    echo "<script>window.location.href = 'badges1.html';</script>";
 } else {
-    echo "<p>✅ You already earned the <strong>'$badgeName'</strong> badge.</p>";
+    echo "<script>window.location.href = 'badges1.html';</script>";
 }
 ?>
