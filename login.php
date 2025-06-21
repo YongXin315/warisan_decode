@@ -17,6 +17,8 @@ if ($name && $password) {
 
         // Check if entered password matches hashed one
         if (password_verify($password, $hashedPassword)) {
+            $_SESSION['user_id'] = $user['id'];  // Assuming your users table has 'id' column
+            $_SESSION['user_name'] = $user['name']; // (Optional) can also store name
             header("Location: welcome.php?name=" . urlencode($name));
             exit();
         } else {
