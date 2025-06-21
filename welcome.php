@@ -11,6 +11,7 @@
     <h1>Welcome, <?php echo htmlspecialchars($name); ?>!</h1>
   <p>Let's begin your journey through Malaysia's cultural heritage!</p>
   <a href="map.html">Go to Map</a>
+  <a href="malacca_intro.html">malacca intro</a>
   <a href="logout.php">Logout</a>
 </body>
 </html>
