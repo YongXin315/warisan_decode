@@ -99,6 +99,16 @@
         margin-top: 5px;
       }
 
+      .heritage-category.locked {
+        background-color: #666666;
+        color: #fff;
+      }
+
+      .heritage-item.locked {
+        opacity: 0.7;
+        border-color: #666666;
+      }
+
       #map {
         width: 100%;
         height: 100%;
@@ -215,6 +225,11 @@
         display: inline-block;
       }
 
+      .popup-category.locked {
+        background-color: #666666;
+        color: #fff;
+      }
+
       @media (max-width: 768px) {
         .map-sidebar {
           width: 280px;
@@ -273,39 +288,37 @@
         </div>
       </div>
 
-              <!-- Map Controls -->
-        <div class="map-controls">
-          <button class="map-btn" onclick="showAllSites()">SHOW ALL SITES</button>
-          <button class="map-btn" onclick="filterByCategory('historical')">
-            HISTORICAL
-          </button>
-          <button class="map-btn" onclick="filterByCategory('cultural')">
-            CULTURAL
-          </button>
-          <button class="map-btn" onclick="filterByCategory('religious')">
-            RELIGIOUS
-          </button>
-          <hr style="border-color: #ffd600; margin: 10px 0;">
-          <button class="map-btn" onclick="filterByState('Melaka')">
-            MELAKA
-          </button>
-          <button class="map-btn" onclick="filterByState('Kuala Lumpur')">
-            KUALA LUMPUR
-          </button>
-          <button class="map-btn" onclick="filterByState('Penang')">
-            PENANG
-          </button>
-          <button class="map-btn" onclick="filterByState('Selangor')">
-            SELANGOR
-          </button>
-          <button class="map-btn" onclick="filterByState('Sarawak')">
-            SARAWAK
-          </button>
-          <button class="map-btn" onclick="filterByState('Sabah')">
-            SABAH
-          </button>
-          <button class="map-btn" onclick="resetMapView()">RESET VIEW</button>
-        </div>
+      <!-- Map Controls -->
+      <div class="map-controls">
+        <button class="map-btn" onclick="showAllSites()">SHOW ALL SITES</button>
+        <button class="map-btn" onclick="filterByCategory('historical')">
+          HISTORICAL
+        </button>
+        <button class="map-btn" onclick="filterByCategory('cultural')">
+          CULTURAL
+        </button>
+        <button class="map-btn" onclick="filterByCategory('religious')">
+          RELIGIOUS
+        </button>
+        <hr style="border-color: #ffd600; margin: 10px 0" />
+        <button class="map-btn" onclick="filterByState('Melaka')">
+          MELAKA
+        </button>
+        <button class="map-btn" onclick="filterByState('Kuala Lumpur')">
+          KUALA LUMPUR
+        </button>
+        <button class="map-btn" onclick="filterByState('Penang')">
+          PENANG
+        </button>
+        <button class="map-btn" onclick="filterByState('Selangor')">
+          SELANGOR
+        </button>
+        <button class="map-btn" onclick="filterByState('Sarawak')">
+          SARAWAK
+        </button>
+        <button class="map-btn" onclick="filterByState('Sabah')">SABAH</button>
+        <button class="map-btn" onclick="resetMapView()">RESET VIEW</button>
+      </div>
 
       <!-- Map -->
       <div id="map"></div>
@@ -329,6 +342,10 @@
           <div class="legend-icon" style="background-color: #ffaa00"></div>
           <span>Museums</span>
         </div>
+        <div class="legend-item">
+          <div class="legend-icon" style="background-color: #666666"></div>
+          <span>Locked Sites</span>
+        </div>
       </div>
     </div>
 
@@ -342,166 +359,238 @@
       let markersLayer;
 
       // Heritage sites data
-                      const heritageSites = [
-          {
-            id: 1,
-            name: "Fort A Famosa",
-            lat: 2.1896,
-            lng: 102.2501,
-            category: "historical",
-            state: "Melaka",
-            description: "Historic Portuguese fortress and military defense structure",
-            details: "Built in 1511 by Portuguese conquistador Alfonso de Albuquerque, only Porta de Santiago gate remains today",
-            color: "#ff4444",
-          },
-          {
-            id: 2,
-            name: "St. Peter's Church",
-            lat: 2.1889,
-            lng: 102.2533,
-            category: "religious",
-            state: "Melaka",
-            description: "Oldest functioning Catholic church in Malaysia",
-            details: "Built in 1710 by Dutch descendants of Portuguese settlers, features unique blend of Eastern and Western architecture",
-            color: "#4444ff",
-          },
-          {
-            id: 3,
-            name: "St. Paul's Church",
-            lat: 2.1898,
-            lng: 102.2502,
-            category: "historical",
-            state: "Melaka",
-            description: "Ruined Portuguese church on St. Paul's Hill",
-            details: "Built in 1521, originally called Our Lady of the Hill, where St. Francis Xavier was temporarily entombed",
-            color: "#ff4444",
-          },
-          {
-            id: 4,
-            name: "Cheng Hoon Teng Temple",
-            lat: 2.1967,
-            lng: 102.2431,
-            category: "religious",
-            state: "Melaka",
-            description: "Malaysia's oldest traditional Chinese temple",
-            details: "Built in 1673 by Chinese Captain Lee Wei King, dedicated to Goddess of Mercy Kuan Yin, features intricate woodwork without nails",
-            color: "#4444ff",
-          },
-          {
-            id: 5,
-            name: "Sri Poyyatha Vinayagar Moorthi Temple",
-            lat: 2.1956,
-            lng: 102.2478,
-            category: "religious",
-            state: "Melaka",
-            description: "Oldest Hindu temple in Malaysia",
-            details: "Built in 1781, dedicated to Lord Vinayagar (Ganesha), showcases South Indian Dravidian architecture and Tamil culture",
-            color: "#4444ff",
-          },
-          {
-            id: 6,
-            name: "Petronas Twin Towers",
-            lat: 3.1579,
-            lng: 101.7121,
-            category: "cultural",
-            state: "Kuala Lumpur",
-            description: "Iconic twin skyscrapers and symbol of modern Malaysia",
-            details:
-              "Built in 1998, these towers represent Malaysia's economic progress",
-            color: "#44ff44",
-          },
-          {
-            id: 7,
-            name: "George Town UNESCO World Heritage Site",
-            lat: 5.4164,
-            lng: 100.3327,
-            category: "historical",
-            state: "Penang",
-            description:
-              "Historic city with colonial architecture and street art",
-            details: "UNESCO World Heritage Site since 2008",
-            color: "#ff4444",
-          },
-          {
-            id: 8,
-            name: "Batu Caves",
-            lat: 3.2379,
-            lng: 101.684,
-            category: "religious",
-            state: "Selangor",
-            description: "Hindu temple complex in limestone caves",
-            details: "Famous for its 272-step staircase and giant golden statue",
-            color: "#4444ff",
-          },
-          {
-            id: 9,
-            name: "National Museum of Malaysia",
-            lat: 3.1412,
-            lng: 101.6865,
-            category: "cultural",
-            state: "Kuala Lumpur",
-            description:
-              "Premier museum showcasing Malaysian history and culture",
-            details:
-              "Established in 1963, houses artifacts from prehistoric times",
-            color: "#ffaa00",
-          },
-          {
-            id: 10,
-            name: "Sultan Abdul Samad Building",
-            lat: 3.1477,
-            lng: 101.6953,
-            category: "historical",
-            state: "Kuala Lumpur",
-            description: "Iconic Moorish architecture government building",
-            details: "Built in 1897, features a 41-meter clock tower",
-            color: "#ff4444",
-          },
-          {
-            id: 11,
-            name: "Kek Lok Si Temple",
-            lat: 5.3951,
-            lng: 100.2717,
-            category: "religious",
-            state: "Penang",
-            description: "Largest Buddhist temple in Malaysia",
-            details: "Built in 1891, known for its pagoda and bronze statue",
-            color: "#4444ff",
-          },
-          {
-            id: 12,
-            name: "Sarawak Cultural Village",
-            lat: 1.7403,
-            lng: 110.3294,
-            category: "cultural",
-            state: "Sarawak",
-            description: "Living museum showcasing Sarawak's ethnic diversity",
-            details: "Features traditional houses and cultural performances",
-            color: "#44ff44",
-          },
-          {
-            id: 13,
-            name: "Kinabalu Park",
-            lat: 6.0833,
-            lng: 116.5583,
-            category: "cultural",
-            state: "Sabah",
-            description: "UNESCO World Heritage natural and cultural site",
-            details: "Home to Mount Kinabalu and diverse ecosystems",
-            color: "#44ff44",
-          },
-          {
-            id: 14,
-            name: "Islamic Arts Museum Malaysia",
-            lat: 3.1416,
-            lng: 101.6908,
-            category: "cultural",
-            state: "Kuala Lumpur",
-            description: "Southeast Asia's largest Islamic arts museum",
-            details: "Houses over 7,000 artifacts from the Islamic world",
-            color: "#ffaa00",
-          },
-        ];
+      const heritageSites = [
+        {
+          id: 1,
+          name: "Fort A Famosa",
+          lat: 2.1896,
+          lng: 102.2501,
+          category: "historical",
+          state: "Melaka",
+          description:
+            "Historic Portuguese fortress and military defense structure",
+          details:
+            "Built in 1511 by Portuguese conquistador Alfonso de Albuquerque, only Porta de Santiago gate remains today",
+          color: "#ff4444",
+        },
+        {
+          id: 2,
+          name: "St. Peter's Church",
+          lat: 2.1889,
+          lng: 102.2533,
+          category: "religious",
+          state: "Melaka",
+          description: "Oldest functioning Catholic church in Malaysia",
+          details:
+            "Built in 1710 by Dutch descendants of Portuguese settlers, features unique blend of Eastern and Western architecture",
+          color: "#4444ff",
+        },
+        {
+          id: 3,
+          name: "St. Paul's Church",
+          lat: 2.1898,
+          lng: 102.2502,
+          category: "historical",
+          state: "Melaka",
+          description: "Ruined Portuguese church on St. Paul's Hill",
+          details:
+            "Built in 1521, originally called Our Lady of the Hill, where St. Francis Xavier was temporarily entombed",
+          color: "#ff4444",
+        },
+        // {
+        //   id: 4,
+        //   name: "Cheng Hoon Teng Temple",
+        //   lat: 2.1967,
+        //   lng: 102.2431,
+        //   category: "religious",
+        //   state: "Melaka",
+        //   description: "Malaysia's oldest traditional Chinese temple",
+        //   details:
+        //     "Built in 1673 by Chinese Captain Lee Wei King, dedicated to Goddess of Mercy Kuan Yin, features intricate woodwork without nails",
+        //   color: "#4444ff",
+        // },
+        // {
+        //   id: 5,
+        //   name: "Sri Poyyatha Vinayagar Moorthi Temple",
+        //   lat: 2.1956,
+        //   lng: 102.2478,
+        //   category: "religious",
+        //   state: "Melaka",
+        //   description: "Oldest Hindu temple in Malaysia",
+        //   details:
+        //     "Built in 1781, dedicated to Lord Vinayagar (Ganesha), showcases South Indian Dravidian architecture and Tamil culture",
+        //   color: "#4444ff",
+        // },
+        {
+          id: 4,
+          name: "Petronas Twin Towers",
+          lat: 3.1579,
+          lng: 101.7121,
+          category: "cultural",
+          state: "Kuala Lumpur",
+          description: "Iconic twin skyscrapers and symbol of modern Malaysia",
+          details:
+            "Built in 1998, these towers represent Malaysia's economic progress",
+          color: "#44ff44",
+        },
+        {
+          id: 5,
+          name: "George Town UNESCO World Heritage Site",
+          lat: 5.4164,
+          lng: 100.3327,
+          category: "historical",
+          state: "Penang",
+          description:
+            "Historic city with colonial architecture and street art",
+          details: "UNESCO World Heritage Site since 2008",
+          color: "#ff4444",
+        },
+        {
+          id: 6,
+          name: "Batu Caves",
+          lat: 3.2379,
+          lng: 101.684,
+          category: "religious",
+          state: "Selangor",
+          description: "Hindu temple complex in limestone caves",
+          details: "Famous for its 272-step staircase and giant golden statue",
+          color: "#4444ff",
+        },
+        {
+          id: 7,
+          name: "National Museum of Malaysia",
+          lat: 3.1412,
+          lng: 101.6865,
+          category: "cultural",
+          state: "Kuala Lumpur",
+          description:
+            "Premier museum showcasing Malaysian history and culture",
+          details:
+            "Established in 1963, houses artifacts from prehistoric times",
+          color: "#ffaa00",
+        },
+        {
+          id: 8,
+          name: "Sultan Abdul Samad Building",
+          lat: 3.1477,
+          lng: 101.6953,
+          category: "historical",
+          state: "Kuala Lumpur",
+          description: "Iconic Moorish architecture government building",
+          details: "Built in 1897, features a 41-meter clock tower",
+          color: "#ff4444",
+        },
+        {
+          id: 9,
+          name: "Kek Lok Si Temple",
+          lat: 5.3951,
+          lng: 100.2717,
+          category: "religious",
+          state: "Penang",
+          description: "Largest Buddhist temple in Malaysia",
+          details: "Built in 1891, known for its pagoda and bronze statue",
+          color: "#4444ff",
+        },
+        {
+          id: 10,
+          name: "Sarawak Cultural Village",
+          lat: 1.7403,
+          lng: 110.3294,
+          category: "cultural",
+          state: "Sarawak",
+          description: "Living museum showcasing Sarawak's ethnic diversity",
+          details: "Features traditional houses and cultural performances",
+          color: "#44ff44",
+        },
+        {
+          id: 11,
+          name: "Kinabalu Park",
+          lat: 6.0833,
+          lng: 116.5583,
+          category: "cultural",
+          state: "Sabah",
+          description: "UNESCO World Heritage natural and cultural site",
+          details: "Home to Mount Kinabalu and diverse ecosystems",
+          color: "#44ff44",
+        },
+        {
+          id: 12,
+          name: "Islamic Arts Museum Malaysia",
+          lat: 3.1416,
+          lng: 101.6908,
+          category: "cultural",
+          state: "Kuala Lumpur",
+          description: "Southeast Asia's largest Islamic arts museum",
+          details: "Houses over 7,000 artifacts from the Islamic world",
+          color: "#ffaa00",
+        },
+      ];
+
+      // Lock/Unlock System
+      function isHeritageUnlocked(siteId) {
+        // ID 1 is always unlocked (starting point)
+        if (siteId === 1) return true;
+        
+        const unlockedSites = JSON.parse(localStorage.getItem('unlockedHeritageSites') || '[]');
+        return unlockedSites.includes(siteId);
+      }
+
+      function unlockHeritage(siteId) {
+        const unlockedSites = JSON.parse(localStorage.getItem('unlockedHeritageSites') || '[]');
+        if (!unlockedSites.includes(siteId)) {
+          unlockedSites.push(siteId);
+          localStorage.setItem('unlockedHeritageSites', JSON.stringify(unlockedSites));
+        }
+      }
+
+      function canPlayGame(siteId, stateName) {
+        // Can play if already unlocked
+        if (isHeritageUnlocked(siteId)) return true;
+        
+        // Can play if it's the next site in sequence for this state
+        const stateSites = heritageSites.filter(site => site.state === stateName).sort((a, b) => a.id - b.id);
+        
+        // Find the highest unlocked ID in this state
+        let highestUnlocked = 0; // Start with 0, since ID 1 is always unlocked
+        for (let site of stateSites) {
+          if (isHeritageUnlocked(site.id)) {
+            highestUnlocked = site.id;
+          }
+        }
+        
+        // Can play if this is the next site after the highest unlocked
+        return siteId === highestUnlocked + 1;
+      }
+
+      function getDisplayInfo(site) {
+        const isUnlocked = isHeritageUnlocked(site.id);
+        const canPlay = canPlayGame(site.id, site.state);
+        
+        if (isUnlocked) {
+          return {
+            name: site.name,
+            description: site.description,
+            details: site.details,
+            category: site.category
+          };
+        } else if (canPlay) {
+          // Next site in sequence - still shows ??? but is playable
+          return {
+            name: "???",
+            description: "Locked Heritage Site",
+            details: "Complete the heritage quest to unlock this site",
+            category: "locked"
+          };
+        } else {
+          // Completely locked sites
+          return {
+            name: "???",
+            description: "Locked Heritage Site",
+            details: "Complete previous heritage sites first",
+            category: "locked"
+          };
+        }
+      }
 
       function initMap() {
         // Initialize map centered on Malaysia
@@ -525,10 +614,54 @@
         document.getElementById("loadingOverlay").style.display = "none";
       }
 
+      function createPopupContent(site) {
+        const displayInfo = getDisplayInfo(site);
+        const isUnlocked = isHeritageUnlocked(site.id);
+        
+        // Check if state has heritage sites available for gaming
+        const hasGameContent = ['Melaka', 'Kuala Lumpur', 'Penang'].includes(site.state);
+        const gameButton = hasGameContent
+            ? `
+                <button onclick="window.location.href='heritage-game.html?state=${encodeURIComponent(site.state)}'" 
+                        style="background-color: #ff4444; color: #fff; border: 2px solid #000; border-radius: 5px; 
+                               padding: 6px 10px; font-family: 'Press Start 2P', cursive; font-size: 5px; 
+                               cursor: pointer; margin-left: 5px;">
+                    🎮 PLAY GAME
+                </button>
+            `
+            : "";
+
+        return `
+                <div class="popup-content">
+                    <h3>${displayInfo.name}</h3>
+                    <p><strong>Location:</strong> ${site.state}</p>
+                    <p><strong>Type:</strong> ${displayInfo.category.toUpperCase()}</p>
+                    <p>${displayInfo.description}</p>
+                    <p><small>${displayInfo.details}</small></p>
+                    <span class="popup-category ${!isUnlocked ? 'locked' : ''}">${displayInfo.category.toUpperCase()}</span>
+                    <br><br>
+                    <div style="display: flex; gap: 5px; margin-top: 8px;">
+                        <button onclick="window.location.href='state-details.html?state=${encodeURIComponent(
+                          site.state
+                        )}'" 
+                                style="background-color: #ffd600; color: #000; border: 2px solid #000; border-radius: 5px; 
+                                       padding: 6px 10px; font-family: 'Press Start 2P', cursive; font-size: 5px; 
+                                       cursor: pointer; flex: 1;">
+                            📖 DETAILS
+                        </button>
+                        ${gameButton}
+                    </div>
+                </div>
+            `;
+      }
+
       function addMarkersToMap() {
         markers = [];
 
         heritageSites.forEach((site) => {
+          const isUnlocked = isHeritageUnlocked(site.id);
+          const markerColor = isUnlocked ? site.color : "#666666";
+          
           // Create custom icon
           const customIcon = L.divIcon({
             className: "custom-marker",
@@ -536,9 +669,10 @@
                         width: 20px;
                         height: 20px;
                         border-radius: 50%;
-                        background-color: ${site.color};
+                        background-color: ${markerColor};
                         border: 3px solid #000;
                         box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                        ${!isUnlocked ? 'opacity: 0.7;' : ''}
                     "></div>`,
             iconSize: [20, 20],
             iconAnchor: [10, 10],
@@ -548,24 +682,8 @@
             icon: customIcon,
           }).addTo(markersLayer);
 
-                          // Create popup content
-                const popupContent = `
-                    <div class="popup-content">
-                        <h3>${site.name}</h3>
-                        <p><strong>Location:</strong> ${site.state}</p>
-                        <p><strong>Type:</strong> ${site.category.toUpperCase()}</p>
-                        <p>${site.description}</p>
-                        <p><small>${site.details}</small></p>
-                        <span class="popup-category">${site.category.toUpperCase()}</span>
-                        <br><br>
-                        <button onclick="window.location.href='state-details.html?state=${encodeURIComponent(site.state)}'" 
-                                style="background-color: #ffd600; color: #000; border: 2px solid #000; border-radius: 5px; 
-                                       padding: 8px 12px; font-family: 'Press Start 2P', cursive; font-size: 6px; 
-                                       cursor: pointer; margin-top: 8px;">
-                            EXPLORE ${site.state.toUpperCase()}
-                        </button>
-                    </div>
-                `;
+          // Create popup content
+          const popupContent = createPopupContent(site);
 
           marker.bindPopup(popupContent);
 
@@ -579,9 +697,9 @@
         });
       }
 
-              function populateSidebar() {
-          updateSidebar(heritageSites);
-        }
+      function populateSidebar() {
+        updateSidebar(heritageSites);
+      }
 
       function highlightSidebarItem(siteId) {
         // Remove previous highlights
@@ -605,149 +723,131 @@
         resetMapView();
       }
 
-              function filterByCategory(category) {
-          markersLayer.clearLayers();
-          markers = [];
+      function filterByCategory(category) {
+        markersLayer.clearLayers();
+        markers = [];
 
-          const filteredSites = heritageSites.filter(
-            (site) => site.category === category
-          );
+        const filteredSites = heritageSites.filter(
+          (site) => site.category === category
+        );
 
-          filteredSites.forEach((site) => {
-            const customIcon = L.divIcon({
-              className: "custom-marker",
-              html: `<div style="
-                        width: 20px;
-                        height: 20px;
-                        border-radius: 50%;
-                        background-color: ${site.color};
-                        border: 3px solid #000;
-                        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-                    "></div>`,
-              iconSize: [20, 20],
-              iconAnchor: [10, 10],
-            });
-
-            const marker = L.marker([site.lat, site.lng], {
-              icon: customIcon,
-            }).addTo(markersLayer);
-
-            const popupContent = `
-                    <div class="popup-content">
-                        <h3>${site.name}</h3>
-                        <p><strong>Location:</strong> ${site.state}</p>
-                        <p><strong>Type:</strong> ${site.category.toUpperCase()}</p>
-                        <p>${site.description}</p>
-                        <p><small>${site.details}</small></p>
-                        <span class="popup-category">${site.category.toUpperCase()}</span>
-                        <br><br>
-                        <button onclick="window.location.href='state-details.html?state=${encodeURIComponent(site.state)}'" 
-                                style="background-color: #ffd600; color: #000; border: 2px solid #000; border-radius: 5px; 
-                                       padding: 8px 12px; font-family: 'Press Start 2P', cursive; font-size: 6px; 
-                                       cursor: pointer; margin-top: 8px;">
-                            EXPLORE ${site.state.toUpperCase()}
-                        </button>
-                    </div>
-                `;
-
-            marker.bindPopup(popupContent);
-            marker.siteData = site;
-            markers.push(marker);
-          });
-
-          updateSidebar(filteredSites);
-        }
-
-        function filterByState(state) {
-          markersLayer.clearLayers();
-          markers = [];
-
-          const filteredSites = heritageSites.filter(
-            (site) => site.state === state
-          );
-
-          filteredSites.forEach((site) => {
-            const customIcon = L.divIcon({
-              className: "custom-marker",
-              html: `<div style="
-                        width: 20px;
-                        height: 20px;
-                        border-radius: 50%;
-                        background-color: ${site.color};
-                        border: 3px solid #000;
-                        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-                    "></div>`,
-              iconSize: [20, 20],
-              iconAnchor: [10, 10],
-            });
-
-            const marker = L.marker([site.lat, site.lng], {
-              icon: customIcon,
-            }).addTo(markersLayer);
-
-            const popupContent = `
-                    <div class="popup-content">
-                        <h3>${site.name}</h3>
-                        <p><strong>Location:</strong> ${site.state}</p>
-                        <p><strong>Type:</strong> ${site.category.toUpperCase()}</p>
-                        <p>${site.description}</p>
-                        <p><small>${site.details}</small></p>
-                        <span class="popup-category">${site.category.toUpperCase()}</span>
-                        <br><br>
-                        <button onclick="window.location.href='state-details.html?state=${encodeURIComponent(site.state)}'" 
-                                style="background-color: #ffd600; color: #000; border: 2px solid #000; border-radius: 5px; 
-                                       padding: 8px 12px; font-family: 'Press Start 2P', cursive; font-size: 6px; 
-                                       cursor: pointer; margin-top: 8px;">
-                            EXPLORE ${site.state.toUpperCase()}
-                        </button>
-                    </div>
-                `;
-
-            marker.bindPopup(popupContent);
-            marker.siteData = site;
-            markers.push(marker);
-          });
-
-          updateSidebar(filteredSites);
+        filteredSites.forEach((site) => {
+          const isUnlocked = isHeritageUnlocked(site.id);
+          const markerColor = isUnlocked ? site.color : "#666666";
           
-          // Auto-zoom to state if filtering
-          if (filteredSites.length > 0) {
-            const stateBounds = L.latLngBounds(filteredSites.map(site => [site.lat, site.lng]));
-            map.fitBounds(stateBounds, { padding: [20, 20] });
-          }
+          const customIcon = L.divIcon({
+            className: "custom-marker",
+            html: `<div style="
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        background-color: ${markerColor};
+                        border: 3px solid #000;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                        ${!isUnlocked ? 'opacity: 0.7;' : ''}
+                    "></div>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10],
+          });
+
+          const marker = L.marker([site.lat, site.lng], {
+            icon: customIcon,
+          }).addTo(markersLayer);
+
+          const popupContent = createPopupContent(site);
+
+          marker.bindPopup(popupContent);
+          marker.siteData = site;
+          markers.push(marker);
+        });
+
+        updateSidebar(filteredSites);
+      }
+
+      function filterByState(state) {
+        markersLayer.clearLayers();
+        markers = [];
+
+        const filteredSites = heritageSites.filter(
+          (site) => site.state === state
+        );
+
+        filteredSites.forEach((site) => {
+          const isUnlocked = isHeritageUnlocked(site.id);
+          const markerColor = isUnlocked ? site.color : "#666666";
+          
+          const customIcon = L.divIcon({
+            className: "custom-marker",
+            html: `<div style="
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        background-color: ${markerColor};
+                        border: 3px solid #000;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                        ${!isUnlocked ? 'opacity: 0.7;' : ''}
+                    "></div>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10],
+          });
+
+          const marker = L.marker([site.lat, site.lng], {
+            icon: customIcon,
+          }).addTo(markersLayer);
+
+          const popupContent = createPopupContent(site);
+
+          marker.bindPopup(popupContent);
+          marker.siteData = site;
+          markers.push(marker);
+        });
+
+        updateSidebar(filteredSites);
+
+        // Auto-zoom to state if filtering
+        if (filteredSites.length > 0) {
+          const stateBounds = L.latLngBounds(
+            filteredSites.map((site) => [site.lat, site.lng])
+          );
+          map.fitBounds(stateBounds, { padding: [20, 20] });
         }
+      }
 
-        function updateSidebar(sites) {
-          // Update sidebar
-          const heritageList = document.getElementById("heritageList");
-          heritageList.innerHTML = "";
+      function updateSidebar(sites) {
+        // Update sidebar
+        const heritageList = document.getElementById("heritageList");
+        heritageList.innerHTML = "";
 
-          sites.forEach((site) => {
-            const siteElement = document.createElement("div");
-            siteElement.className = "heritage-item";
-            siteElement.setAttribute("data-site-id", site.id);
-            siteElement.innerHTML = `
-                    <h4>${site.name}</h4>
-                    <p><strong>${site.state}</strong> • ${site.category.toUpperCase()}</p>
-                    <p>${site.description}</p>
-                    <p><small>${site.details}</small></p>
-                    <span class="heritage-category">${site.category.toUpperCase()}</span>
+        sites.forEach((site) => {
+          const displayInfo = getDisplayInfo(site);
+          const isUnlocked = isHeritageUnlocked(site.id);
+          const siteElement = document.createElement("div");
+          siteElement.className = `heritage-item ${!isUnlocked ? 'locked' : ''}`;
+          siteElement.setAttribute("data-site-id", site.id);
+          siteElement.innerHTML = `
+                    <h4>${displayInfo.name}</h4>
+                    <p><strong>${
+                      site.state
+                    }</strong> • ${displayInfo.category.toUpperCase()}</p>
+                    <p>${displayInfo.description}</p>
+                    <p><small>${displayInfo.details}</small></p>
+                    <span class="heritage-category ${!isUnlocked ? 'locked' : ''}">${displayInfo.category.toUpperCase()}</span>
                 `;
 
-            siteElement.addEventListener("click", () => {
-              map.setView([site.lat, site.lng], 15);
+          siteElement.addEventListener("click", () => {
+            map.setView([site.lat, site.lng], 15);
 
-              const marker = markers.find((m) => m.siteData.id === site.id);
-              if (marker) {
-                marker.openPopup();
-              }
+            const marker = markers.find((m) => m.siteData.id === site.id);
+            if (marker) {
+              marker.openPopup();
+            }
 
-              highlightSidebarItem(site.id);
-            });
-
-            heritageList.appendChild(siteElement);
+            highlightSidebarItem(site.id);
           });
-        }
+
+          heritageList.appendChild(siteElement);
+        });
+      }
 
       function resetMapView() {
         map.setView([4.2105, 101.9758], 6);
@@ -759,9 +859,21 @@
         });
       }
 
+      // Function to refresh map display (useful when returning from game)
+      function refreshMapDisplay() {
+        markersLayer.clearLayers();
+        addMarkersToMap();
+        populateSidebar();
+      }
+
       // Initialize map when page loads
       document.addEventListener("DOMContentLoaded", function () {
         initMap();
+      });
+
+      // Refresh map when returning to the page (in case heritage sites were unlocked)
+      window.addEventListener("focus", function() {
+        refreshMapDisplay();
       });
     </script>
   </body>

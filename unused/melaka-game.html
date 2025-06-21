@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Melaka Heritage Quest - Warisan Decode</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      .game-container {
+        margin-top: 70px;
+        height: calc(100vh - 70px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .treasure-map {
+        width: 100%;
+        height: 100%;
+        background-image: url("imgs/bg.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+        border: 10px solid #8b4513;
+        box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.3);
+      }
+
+      .game-header {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 15px 30px;
+        border-radius: 15px;
+        border: 3px solid #ffd600;
+      }
+
+      .game-header h1 {
+        font-size: 16px;
+        color: #ffd600;
+        margin: 0;
+        text-shadow: 2px 2px 0px #000;
+      }
+
+      .game-header p {
+        font-size: 8px;
+        color: #fff;
+        margin: 5px 0 0 0;
+      }
+
+      .checkpoint {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+      }
+
+      .checkpoint:hover {
+        transform: scale(1.2);
+        filter: brightness(1.3);
+      }
+
+      .checkpoint-icon {
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, #ff4444, #cc0000);
+        border: 4px solid #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        text-shadow: 1px 1px 2px #000;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+
+      .checkpoint-label {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: #ffd600;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 6px;
+        white-space: nowrap;
+        border: 2px solid #ffd600;
+        text-align: center;
+      }
+
+      .checkpoint-year {
+        font-size: 5px;
+        color: #fff;
+        margin-top: 2px;
+      }
+
+      .path {
+        position: absolute;
+        border: 3px dashed #8b4513;
+        opacity: 0.7;
+        z-index: 1;
+      }
+
+      .path-1 {
+        top: 45%;
+        left: 15%;
+        width: 25%;
+        height: 0;
+        transform: rotate(-30deg);
+      }
+
+      .path-2 {
+        top: 25%;
+        left: 35%;
+        width: 20%;
+        height: 0;
+        transform: rotate(45deg);
+      }
+
+      .path-3 {
+        top: 35%;
+        left: 50%;
+        width: 15%;
+        height: 0;
+        transform: rotate(-45deg);
+      }
+
+      .path-4 {
+        top: 50%;
+        left: 60%;
+        width: 25%;
+        height: 0;
+        transform: rotate(30deg);
+      }
+
+      .compass {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 80px;
+        height: 80px;
+        background: rgba(139, 69, 19, 0.8);
+        border: 3px solid #ffd600;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #ffd600;
+      }
+
+      .back-btn {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color: #ffd600;
+        color: #000;
+        border: 2px solid #000;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-family: "Press Start 2P", cursive;
+        font-size: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        z-index: 100;
+      }
+
+      .back-btn:hover {
+        background-color: #ffa000;
+        color: #000;
+        transform: translateY(-2px);
+      }
+
+      .game-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 30px;
+        border: 3px solid #ffd600;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+      }
+
+      .modal-content h2 {
+        font-size: 14px;
+        color: #000;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #ffd600;
+        padding-bottom: 10px;
+      }
+
+      .modal-content p {
+        font-size: 8px;
+        color: #333;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      .game-options {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .game-btn {
+        background-color: #ffd600;
+        color: #000;
+        border: 2px solid #000;
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-family: "Press Start 2P", cursive;
+        font-size: 7px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .game-btn:hover {
+        background-color: #ffa000;
+        color: #000;
+        transform: translateY(-2px);
+      }
+
+      .close-btn {
+        background-color: #ff4444;
+        color: #fff;
+      }
+
+      .close-btn:hover {
+        background-color: #cc0000;
+        color: #fff;
+      }
+
+      /* Decorative elements */
+      .decoration {
+        position: absolute;
+        opacity: 0.3;
+        pointer-events: none;
+      }
+
+      .palm-tree {
+        bottom: 10%;
+        left: 5%;
+        font-size: 30px;
+        color: #228b22;
+      }
+
+      .mountain {
+        top: 15%;
+        left: 20%;
+        font-size: 25px;
+        color: #696969;
+      }
+
+      .ship {
+        bottom: 20%;
+        right: 10%;
+        font-size: 25px;
+        color: #8b4513;
+      }
+
+      @media (max-width: 768px) {
+        .checkpoint {
+          width: 50px;
+          height: 50px;
+        }
+
+        .checkpoint-label {
+          font-size: 5px;
+          top: -35px;
+        }
+
+        .game-header h1 {
+          font-size: 12px;
+        }
+
+        .game-header p {
+          font-size: 6px;
+        }
+
+        .compass {
+          width: 60px;
+          height: 60px;
+          font-size: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="welcome.php">WARISAN DECODE</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="welcome.php">Home</a>
+            <a class="nav-link" href="maps-leaflet.html">Heritage Map</a>
+            <a class="nav-link active" href="melaka-game.html"
+              >Heritage Quest</a
+            >
+            <a class="nav-link" href="profile.php">Profile</a>
+            <a class="nav-link" href="logout.php">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="game-container">
+      <div class="treasure-map">
+        <!-- Back Button -->
+        <a href="maps-leaflet.html" class="back-btn">← BACK TO MAP</a>
+
+        <!-- Game Header -->
+        <div class="game-header">
+          <h1>🗺️ MELAKA HERITAGE QUEST</h1>
+          <p>Choose your checkpoint to begin the adventure!</p>
+        </div>
+
+        <!-- Compass -->
+        <div class="compass">🧭<br />N</div>
+
+        <!-- Treasure Map Paths -->
+        <div class="path path-1"></div>
+        <div class="path path-2"></div>
+        <div class="path path-3"></div>
+        <div class="path path-4"></div>
+
+        <!-- Heritage Site Checkpoints -->
+        <div
+          class="checkpoint"
+          style="top: 50%; left: 10%"
+          onclick="openGameModal('fort')"
+        >
+          <div class="checkpoint-icon">🏰</div>
+          <div class="checkpoint-label">
+            Fort A Famosa
+            <div class="checkpoint-year">(1511)</div>
+          </div>
+        </div>
+
+        <div
+          class="checkpoint"
+          style="top: 65%; left: 35%"
+          onclick="openGameModal('stpeter')"
+        >
+          <div class="checkpoint-icon">⛪</div>
+          <div class="checkpoint-label">
+            St. Peter's Church
+            <div class="checkpoint-year">(1710)</div>
+          </div>
+        </div>
+
+        <div
+          class="checkpoint"
+          style="top: 20%; left: 50%"
+          onclick="openGameModal('stpaul')"
+        >
+          <div class="checkpoint-icon">🏛️</div>
+          <div class="checkpoint-label">
+            St. Paul's Church
+            <div class="checkpoint-year">(1521)</div>
+          </div>
+        </div>
+
+        <div
+          class="checkpoint"
+          style="top: 55%; left: 55%"
+          onclick="openGameModal('chenghoon')"
+        >
+          <div class="checkpoint-icon">🏮</div>
+          <div class="checkpoint-label">
+            Cheng Hoon Teng Temple
+            <div class="checkpoint-year">(1645)</div>
+          </div>
+        </div>
+
+        <div
+          class="checkpoint"
+          style="top: 25%; left: 75%"
+          onclick="openGameModal('vinayagar')"
+        >
+          <div class="checkpoint-icon">🕉️</div>
+          <div class="checkpoint-label">
+            Sri Poyyatha Vinayagar Moorthi Temple
+            <div class="checkpoint-year">(1781)</div>
+          </div>
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="decoration palm-tree">🌴</div>
+        <div class="decoration mountain">⛰️</div>
+        <div class="decoration ship">⛵</div>
+      </div>
+    </div>
+
+    <!-- Game Modal -->
+    <div id="gameModal" class="game-modal">
+      <div class="modal-content">
+        <h2 id="modalTitle">Heritage Site Challenge</h2>
+        <p id="modalDescription">
+          Choose your adventure at this historic location!
+        </p>
+        <div class="game-options">
+          <button class="game-btn" onclick="startTrivia()">
+            📚 TRIVIA QUIZ
+          </button>
+          <button class="game-btn" onclick="startPuzzle()">
+            🧩 HISTORY PUZZLE
+          </button>
+          <button class="game-btn" onclick="startExplore()">
+            🔍 VIRTUAL TOUR
+          </button>
+          <button class="game-btn close-btn" onclick="closeGameModal()">
+            ❌ CLOSE
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      let currentCheckpoint = null;
+
+      const checkpoints = {
+        fort: {
+          name: "Fort A Famosa",
+          year: "1511",
+          description:
+            "Test your knowledge about this Portuguese fortress! Learn about the military strategies, architectural features, and historical significance of Malaysia's oldest surviving European architectural remains.",
+          icon: "🏰",
+        },
+        stpeter: {
+          name: "St. Peter's Church",
+          year: "1710",
+          description:
+            "Discover the secrets of Malaysia's oldest functioning Catholic church! Explore the unique blend of Eastern and Western architecture and learn about the Dutch colonial influence.",
+          icon: "⛪",
+        },
+        stpaul: {
+          name: "St. Paul's Church",
+          year: "1521",
+          description:
+            "Uncover the mysteries of this hilltop church ruins! Learn about St. Francis Xavier's connection to this sacred site and its transformation through different colonial periods.",
+          icon: "🏛️",
+        },
+        chenghoon: {
+          name: "Cheng Hoon Teng Temple",
+          year: "1645",
+          description:
+            "Explore Malaysia's oldest traditional Chinese temple! Discover the intricate woodwork craftsmanship, learn about Goddess Kuan Yin, and understand Chinese cultural heritage in Melaka.",
+          icon: "🏮",
+        },
+        vinayagar: {
+          name: "Sri Poyyatha Vinayagar Moorthi Temple",
+          year: "1781",
+          description:
+            "Journey through Malaysia's oldest Hindu temple! Learn about Lord Ganesha, South Indian Dravidian architecture, and the Tamil cultural heritage in Melaka.",
+          icon: "🕉️",
+        },
+      };
+
+      function openGameModal(checkpointId) {
+        currentCheckpoint = checkpointId;
+        const checkpoint = checkpoints[checkpointId];
+
+        document.getElementById(
+          "modalTitle"
+        ).innerHTML = `${checkpoint.icon} ${checkpoint.name}`;
+        document.getElementById("modalDescription").textContent =
+          checkpoint.description;
+        document.getElementById("gameModal").style.display = "flex";
+      }
+
+      function closeGameModal() {
+        document.getElementById("gameModal").style.display = "none";
+        currentCheckpoint = null;
+      }
+
+      function startTrivia() {
+        alert(
+          `🎯 Starting Trivia Quiz for ${checkpoints[currentCheckpoint].name}!\n\nComing Soon: Interactive quiz about this heritage site's history, architecture, and cultural significance!`
+        );
+        closeGameModal();
+      }
+
+      function startPuzzle() {
+        alert(
+          `🧩 Starting History Puzzle for ${checkpoints[currentCheckpoint].name}!\n\nComing Soon: Solve puzzles to reconstruct historical events and architectural elements!`
+        );
+        closeGameModal();
+      }
+
+      function startExplore() {
+        alert(
+          `🔍 Starting Virtual Tour of ${checkpoints[currentCheckpoint].name}!\n\nComing Soon: Immersive 360° virtual exploration with historical narration!`
+        );
+        closeGameModal();
+      }
+
+      // Close modal when clicking outside
+      document
+        .getElementById("gameModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeGameModal();
+          }
+        });
+
+      // Keyboard shortcuts
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeGameModal();
+        }
+      });
+
+      // Add some interactive sound effects (optional)
+      function playCheckpointSound() {
+        // You can add audio elements here for better UX
+        console.log("🎵 Checkpoint discovered!");
+      }
+
+      // Initialize page
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("🗺️ Melaka Heritage Quest loaded!");
+
+        // Add hover sound effects to checkpoints
+        document.querySelectorAll(".checkpoint").forEach((checkpoint) => {
+          checkpoint.addEventListener("mouseenter", playCheckpointSound);
+        });
+      });
+    </script>
+  </body>
+</html>
