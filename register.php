@@ -28,7 +28,7 @@ if ($name && $password) {
         $insertStmt->execute();
 
         // Step 3: Redirect to welcome page
-        header("Location: welcome.php?name=" . urlencode($name));
+        header("Location: rules.html);
         exit();
     }
 } else {
