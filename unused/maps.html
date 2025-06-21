@@ -592,23 +592,19 @@
         map.setZoom(6);
       }
 
-              // Handle map loading error
+        // Handle map loading error
         function handleMapError() {
-            const isPlaceholderKey = document.querySelector('script[src*="YOUR_API_KEY"]') !== null;
-            
-            let errorMessage = "MAP LOADING FAILED";
-            let details = "Please check your internet connection";
-            
-            if (isPlaceholderKey) {
-                errorMessage = "GOOGLE MAPS API KEY MISSING";
-                details = "You need to replace YOUR_API_KEY with a real Google Maps API key";
-            }
+            let errorMessage = "GOOGLE MAPS API ERROR";
+            let details = "Common issues: API key not enabled, billing not set up, or domain restrictions";
             
             document.getElementById("loadingOverlay").innerHTML = `
                 <div style="text-align: center;">
                     <div>${errorMessage}</div>
                     <div style="font-size: 8px; margin-top: 10px;">${details}</div>
                     <div style="font-size: 6px; margin-top: 15px; color: #ffa000;">
+                        Check browser console (F12) for detailed error messages
+                    </div>
+                    <div style="font-size: 6px; margin-top: 10px; color: #ffa000;">
                         For a working version, use the Leaflet map instead
                     </div>
                     <button onclick="window.location.href='maps-leaflet.html'" style="margin-top: 20px; padding: 10px 20px; background: #44ff44; border: 2px solid #000; font-family: 'Press Start 2P'; font-size: 8px;">USE WORKING MAP</button>
@@ -617,37 +613,40 @@
             `;
         }
 
-              // Initialize map when page loads
+        // Load Google Maps API asynchronously
+        function loadGoogleMapsAPI() {
+            return new Promise((resolve, reject) => {
+                if (window.google && window.google.maps) {
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAu3Hb4UUT9yus2PeY9hwxgNOPxrPolXTw&libraries=marker,geometry&loading=async';
+                script.async = true;
+                script.defer = true;
+                script.onload = resolve;
+                script.onerror = (error) => {
+                    console.error('Google Maps script loading failed:', error);
+                    reject(new Error('Failed to load Google Maps API'));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // Initialize map when page loads
         window.onload = async function () {
             try {
+                console.log('Loading Google Maps API...');
                 await loadGoogleMapsAPI();
+                console.log('Google Maps API loaded successfully');
                 await initMap();
+                console.log('Map initialized successfully');
             } catch (error) {
                 console.error('Failed to load Google Maps:', error);
                 handleMapError();
             }
         };
-    </script>
-
-    <!-- Google Maps API - Replace YOUR_API_KEY with your actual API key -->
-    <script>
-      // Load Google Maps API asynchronously
-      function loadGoogleMapsAPI() {
-        return new Promise((resolve, reject) => {
-          if (window.google && window.google.maps) {
-            resolve();
-            return;
-          }
-          
-          const script = document.createElement('script');
-          script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAu3Hb4UUT9yus2PeY9hwxgNOPxrPolXTw&libraries=marker,geometry&loading=async';
-          script.async = true;
-          script.defer = true;
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
     </script>
   </body>
 </html>

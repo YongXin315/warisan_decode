@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Malaysia Heritage Map - Warisan Decode</title>
+    
+    <!-- Google Maps Web Components -->
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAu3Hb4UUT9yus2PeY9hwxgNOPxrPolXTw&callback=initializeMap&libraries=maps,marker,geometry&v=beta">
+    </script>
+    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    
+    <style>
+        /* Map container styles */
+        gmp-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .map-container {
+            margin-top: 70px;
+            height: calc(100vh - 70px);
+            position: relative;
+        }
+        
+        .map-sidebar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 350px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 3px solid #ffd600;
+            z-index: 1000;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+        
+        .map-sidebar h2 {
+            font-size: 14px;
+            color: #000;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #ffd600;
+            padding-bottom: 10px;
+        }
+        
+        .heritage-list {
+            height: 400px;
+            overflow: hidden;
+        }
+        
+        .heritage-item {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .heritage-item:hover {
+            background-color: rgba(255, 214, 0, 0.2);
+            border-color: #ffd600;
+            transform: translateY(-2px);
+        }
+        
+        .heritage-item.selected {
+            background-color: rgba(255, 214, 0, 0.3);
+            border-color: #ffd600;
+        }
+        
+        .heritage-item h4 {
+            font-size: 10px;
+            color: #000;
+            margin-bottom: 8px;
+        }
+        
+        .heritage-item p {
+            font-size: 8px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .heritage-category {
+            display: inline-block;
+            background-color: #ffd600;
+            color: #000;
+            font-size: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .state-label {
+            background-color: #333;
+            color: #ffd600;
+            font-size: 6px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .map-btn {
+            background-color: #ffd600;
+            color: #000;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-family: "Press Start 2P", cursive;
+            font-size: 8px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: block;
+            width: 150px;
+            transition: all 0.3s ease;
+        }
+        
+        .map-btn:hover {
+            background-color: #ffa000;
+            transform: translateY(-2px);
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #ffd600;
+            z-index: 1000;
+        }
+        
+        .legend h4 {
+            font-size: 10px;
+            color: #000;
+            margin-bottom: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 7px;
+        }
+        
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 8px;
+            border: 2px solid #000;
+        }
+        
+        /* Custom marker styles */
+        gmp-advanced-marker {
+            cursor: pointer;
+            z-index: 2000 !important;
+            position: relative;
+        }
+
+        gmp-advanced-marker div {
+            z-index: 2001 !important;
+            position: relative;
+        }
+
+        gmp-advanced-marker:hover div {
+            transform: scale(1.1) !important;
+            z-index: 2002 !important;
+        }
+        
+        /* State info panel */
+        .state-info {
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 2px solid #ffd600;
+            border-radius: 10px;
+            padding: 15px;
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            z-index: 1000;
+            width: 300px;
+            display: none;
+        }
+        
+        .state-info h3 {
+            font-size: 12px;
+            color: #000;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ffd600;
+            padding-bottom: 5px;
+        }
+        
+        .state-info p {
+            font-size: 8px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        /* State boundary styles */
+        .state-boundary {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .state-boundary:hover {
+            stroke-width: 3px;
+            fill-opacity: 0.3;
+        }
+        
+        /* State selector */
+        .state-selector {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #ffd600;
+            z-index: 1000;
+            max-width: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .state-selector::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .state-selector::-webkit-scrollbar-track {
+            background: rgba(255, 214, 0, 0.1);
+            border-radius: 3px;
+        }
+
+        .state-selector::-webkit-scrollbar-thumb {
+            background: #ffd600;
+            border-radius: 3px;
+        }
+
+        .state-selector::-webkit-scrollbar-thumb:hover {
+            background: #ffed4e;
+        }
+        
+        .state-selector h4 {
+            font-size: 10px;
+            color: #000;
+            margin-bottom: 10px;
+        }
+        
+        .state-btn {
+            display: block;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.05);
+            border: 2px solid #333;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            font-family: "Press Start 2P", cursive;
+            font-size: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        
+        .state-btn:hover {
+            background-color: #ffd600;
+            border-color: #000;
+        }
+        
+        .state-btn.active {
+            background-color: #ffd600;
+            border-color: #000;
+        }
+        
+        @media (max-width: 768px) {
+            .map-sidebar {
+                width: 280px;
+                left: 10px;
+                top: 10px;
+            }
+            
+            .map-controls {
+                right: 10px;
+                top: 10px;
+            }
+            
+            .map-btn {
+                width: 120px;
+                font-size: 6px;
+                padding: 8px 12px;
+            }
+            
+            .state-info {
+                width: 250px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="welcome.php">WARISAN DECODE</a>
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="welcome.php">Home</a>
+                    <a class="nav-link active" href="maps-google-modern.html">Malaysia Map</a>
+                    <a class="nav-link" href="maps-leaflet.html">Alternative Map</a>
+                    <a class="nav-link" href="profile.php">Profile</a>
+                    <a class="nav-link" href="logout.php">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="map-container">
+        <!-- Map Sidebar -->
+        <div class="map-sidebar">
+            <h2>🗺️ HERITAGE SITES</h2>
+            <div class="heritage-list" id="heritageList">
+                <!-- Heritage sites will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Map Controls -->
+        <div class="map-controls">
+            <button class="map-btn" onclick="showAllSites()">SHOW ALL SITES</button>
+            <button class="map-btn" onclick="filterByState('Kuala Lumpur')">KUALA LUMPUR</button>
+            <button class="map-btn" onclick="filterByState('Penang')">PENANG</button>
+            <button class="map-btn" onclick="filterByState('Melaka')">MELAKA</button>
+            <button class="map-btn" onclick="resetMapView()">RESET VIEW</button>
+        </div>
+
+        <!-- Google Maps with Web Components -->
+        <gmp-map 
+            center="4.2105,101.9758" 
+            zoom="6" 
+            map-id="heritage_map"
+            style="height: 100%; width: 100%;">
+            
+            <!-- Heritage Sites Markers -->
+            <!-- Petronas Twin Towers -->
+            <gmp-advanced-marker 
+                position="3.1579,101.7121" 
+                title="Petronas Twin Towers"
+                data-category="cultural"
+                data-state="Kuala Lumpur">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #44ff44; border: 4px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s ease;"></div>
+            </gmp-advanced-marker>
+            
+            <!-- George Town -->
+            <gmp-advanced-marker 
+                position="5.4164,100.3327" 
+                title="George Town UNESCO World Heritage Site"
+                data-category="historical"
+                data-state="Penang">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #ff4444; border: 4px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s ease;"></div>
+            </gmp-advanced-marker>
+            
+            <!-- Melaka Historic City -->
+            <gmp-advanced-marker 
+                position="2.2055,102.2502" 
+                title="Melaka Historic City"
+                data-category="historical"
+                data-state="Melaka">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #ff4444; border: 4px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s ease;"></div>
+            </gmp-advanced-marker>
+            
+            <!-- Batu Caves -->
+            <gmp-advanced-marker 
+                position="3.2379,101.684" 
+                title="Batu Caves"
+                data-category="religious"
+                data-state="Selangor">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #4444ff; border: 4px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s ease;"></div>
+            </gmp-advanced-marker>
+            
+            <!-- National Museum -->
+            <gmp-advanced-marker 
+                position="3.1412,101.6865" 
+                title="National Museum of Malaysia"
+                data-category="cultural"
+                data-state="Kuala Lumpur">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #ffaa00; border: 4px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s ease;"></div>
+            </gmp-advanced-marker>
+            
+            <!-- Sultan Abdul Samad Building -->
+            <gmp-advanced-marker 
+                position="3.1477,101.6953" 
+                title="Sultan Abdul Samad Building"
+                data-category="historical"
+                data-state="Kuala Lumpur">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #ff4444; border: 4px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s ease;"></div>
+            </gmp-advanced-marker>
+            
+            <!-- Kek Lok Si Temple -->
+            <gmp-advanced-marker 
+                position="5.3951,100.2717" 
+                title="Kek Lok Si Temple"
+                data-category="religious"
+                data-state="Penang">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #4444ff; border: 4px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s ease;"></div>
+            </gmp-advanced-marker>
+            
+            <!-- Sarawak Cultural Village -->
+            <gmp-advanced-marker 
+                position="1.7403,110.3294" 
+                title="Sarawak Cultural Village"
+                data-category="cultural"
+                data-state="Sarawak">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #44ff44; border: 4px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s ease;"></div>
+            </gmp-advanced-marker>
+            
+            <!-- Kinabalu Park -->
+            <gmp-advanced-marker 
+                position="6.0833,116.5583" 
+                title="Kinabalu Park"
+                data-category="cultural"
+                data-state="Sabah">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #44ff44; border: 4px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s ease;"></div>
+            </gmp-advanced-marker>
+            
+            <!-- Islamic Arts Museum -->
+            <gmp-advanced-marker 
+                position="3.1416,101.6908" 
+                title="Islamic Arts Museum Malaysia"
+                data-category="cultural"
+                data-state="Kuala Lumpur">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #ffaa00; border: 4px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s ease;"></div>
+            </gmp-advanced-marker>
+        </gmp-map>
+
+        <!-- State Selector -->
+        <div class="state-selector">
+            <h4>🗺️ MALAYSIA REGIONS</h4>
+            <h5 style="color: #ffd600; font-size: 10px; margin: 5px 0;">STATES (13)</h5>
+            <button class="state-btn" onclick="clickState('Johor')">Johor</button>
+            <button class="state-btn" onclick="clickState('Kedah')">Kedah</button>
+            <button class="state-btn" onclick="clickState('Kelantan')">Kelantan</button>
+            <button class="state-btn" onclick="clickState('Melaka')">Melaka</button>
+            <button class="state-btn" onclick="clickState('Negeri Sembilan')">N. Sembilan</button>
+            <button class="state-btn" onclick="clickState('Pahang')">Pahang</button>
+            <button class="state-btn" onclick="clickState('Penang')">Penang</button>
+            <button class="state-btn" onclick="clickState('Perak')">Perak</button>
+            <button class="state-btn" onclick="clickState('Perlis')">Perlis</button>
+            <button class="state-btn" onclick="clickState('Sabah')">Sabah</button>
+            <button class="state-btn" onclick="clickState('Sarawak')">Sarawak</button>
+            <button class="state-btn" onclick="clickState('Selangor')">Selangor</button>
+            <button class="state-btn" onclick="clickState('Terengganu')">Terengganu</button>
+            
+            <h5 style="color: #ffd600; font-size: 10px; margin: 10px 0 5px 0;">FEDERAL TERRITORIES (3)</h5>
+            <button class="state-btn" onclick="clickState('Kuala Lumpur')">Kuala Lumpur</button>
+            <button class="state-btn" onclick="clickState('Putrajaya')">Putrajaya</button>
+            <button class="state-btn" onclick="clickState('Labuan')">Labuan</button>
+            
+            <button class="state-btn" onclick="showAllStates()" style="margin-top: 10px; background: #e74c3c;">Show All</button>
+        </div>
+
+        <!-- State Information Panel -->
+        <div class="state-info" id="stateInfo">
+            <h3 id="stateName">State Information</h3>
+            <p id="stateDescription">Click on a state or heritage site to see information</p>
+            <p id="stateSites">Heritage sites: <span id="siteCount">0</span></p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let map;
+        let statePolygons = [];
+        
+        // Malaysian state and federal territory boundary coordinates (all 16 regions)
+        const stateBoundaries = {
+            // 13 States
+            "Johor": {
+                coords: [
+                    {lat: 2.1897, lng: 103.0618},
+                    {lat: 2.1897, lng: 104.2285},
+                    {lat: 1.9852, lng: 104.4785},
+                    {lat: 1.7808, lng: 104.5285},
+                    {lat: 1.5763, lng: 104.4785},
+                    {lat: 1.3719, lng: 104.3872},
+                    {lat: 1.2200, lng: 104.2002},
+                    {lat: 1.1681, lng: 103.9002},
+                    {lat: 1.2200, lng: 103.6002},
+                    {lat: 1.3288, lng: 103.3502},
+                    {lat: 1.4852, lng: 103.1502},
+                    {lat: 1.6897, lng: 103.0618},
+                    {lat: 1.8897, lng: 103.0618},
+                    {lat: 2.1897, lng: 103.0618}
+                ],
+                color: "#5f27cd",
+                center: {lat: 1.4854, lng: 103.7618}
+            },
+            "Kedah": {
+                coords: [
+                    {lat: 6.7278, lng: 100.0956},
+                    {lat: 6.7278, lng: 100.8239},
+                    {lat: 6.4234, lng: 100.9739},
+                    {lat: 6.1164, lng: 100.9239},
+                    {lat: 5.8119, lng: 100.8739},
+                    {lat: 5.7075, lng: 100.7827},
+                    {lat: 5.6556, lng: 100.6956},
+                    {lat: 5.6075, lng: 100.5956},
+                    {lat: 5.6644, lng: 100.4456},
+                    {lat: 5.8234, lng: 100.3956},
+                    {lat: 6.0278, lng: 100.3956},
+                    {lat: 6.2278, lng: 100.2956},
+                    {lat: 6.4278, lng: 100.1956},
+                    {lat: 6.6278, lng: 100.0956},
+                    {lat: 6.7278, lng: 100.0956}
+                ],
+                color: "#e17055",
+                center: {lat: 6.1184, lng: 100.3685}
+            },
+            "Kelantan": {
+                coords: [
+                    {lat: 6.4278, lng: 101.9956},
+                    {lat: 6.4278, lng: 102.5239},
+                    {lat: 6.1234, lng: 102.6739},
+                    {lat: 5.8164, lng: 102.6239},
+                    {lat: 5.5119, lng: 102.5739},
+                    {lat: 5.4075, lng: 102.4827},
+                    {lat: 5.3556, lng: 102.3956},
+                    {lat: 5.3075, lng: 102.2956},
+                    {lat: 5.3644, lng: 102.1456},
+                    {lat: 5.5234, lng: 102.0956},
+                    {lat: 5.7278, lng: 102.0956},
+                    {lat: 5.9278, lng: 101.9956},
+                    {lat: 6.1278, lng: 101.9956},
+                    {lat: 6.3278, lng: 101.9956},
+                    {lat: 6.4278, lng: 101.9956}
+                ],
+                color: "#00b894",
+                center: {lat: 5.8816, lng: 102.3386}
+            },
+            "Melaka": {
+                coords: [
+                    {lat: 2.4897, lng: 102.0502},
+                    {lat: 2.4897, lng: 102.4285},
+                    {lat: 2.3852, lng: 102.4785},
+                    {lat: 2.2808, lng: 102.4285},
+                    {lat: 2.1763, lng: 102.3785},
+                    {lat: 2.0719, lng: 102.2872},
+                    {lat: 2.0200, lng: 102.2002},
+                    {lat: 2.0719, lng: 102.1002},
+                    {lat: 2.2288, lng: 102.0502},
+                    {lat: 2.3852, lng: 102.0502},
+                    {lat: 2.4897, lng: 102.0502}
+                ],
+                color: "#f7b731",
+                center: {lat: 2.2055, lng: 102.2502}
+            },
+            "Negeri Sembilan": {
+                coords: [
+                    {lat: 3.0738, lng: 101.6669},
+                    {lat: 3.0738, lng: 102.2644},
+                    {lat: 2.8738, lng: 102.3644},
+                    {lat: 2.6738, lng: 102.3144},
+                    {lat: 2.4738, lng: 102.2644},
+                    {lat: 2.3738, lng: 102.1731},
+                    {lat: 2.3219, lng: 102.0860},
+                    {lat: 2.3738, lng: 101.9860},
+                    {lat: 2.5307, lng: 101.9360},
+                    {lat: 2.7352, lng: 101.9860},
+                    {lat: 2.9396, lng: 101.9860},
+                    {lat: 3.0738, lng: 101.6669}
+                ],
+                color: "#a29bfe",
+                center: {lat: 2.7252, lng: 102.1257}
+            },
+            "Pahang": {
+                coords: [
+                    {lat: 4.4621, lng: 101.4901},
+                    {lat: 4.4621, lng: 103.4183},
+                    {lat: 4.1145, lng: 103.5269},
+                    {lat: 3.8131, lng: 103.4644},
+                    {lat: 3.5738, lng: 103.3669},
+                    {lat: 3.3213, lng: 103.2720},
+                    {lat: 3.0588, lng: 103.1634},
+                    {lat: 2.8544, lng: 103.0901},
+                    {lat: 2.6213, lng: 102.9544},
+                    {lat: 2.5213, lng: 102.8088},
+                    {lat: 2.7563, lng: 102.6588},
+                    {lat: 3.0044, lng: 102.5544},
+                    {lat: 3.2074, lng: 102.4901},
+                    {lat: 3.4278, lng: 102.3956},
+                    {lat: 3.6278, lng: 102.2956},
+                    {lat: 3.8621, lng: 102.1901},
+                    {lat: 4.0621, lng: 101.8901},
+                    {lat: 4.2621, lng: 101.6901},
+                    {lat: 4.4621, lng: 101.4901}
+                ],
+                color: "#6c5ce7",
+                center: {lat: 3.8126, lng: 102.3252}
+            },
+            "Penang": {
+                coords: [
+                    {lat: 5.6278, lng: 100.1956},
+                    {lat: 5.6278, lng: 100.5239},
+                    {lat: 5.5234, lng: 100.5739},
+                    {lat: 5.4164, lng: 100.5239},
+                    {lat: 5.3119, lng: 100.4739},
+                    {lat: 5.2075, lng: 100.3827},
+                    {lat: 5.1556, lng: 100.2956},
+                    {lat: 5.2075, lng: 100.1956},
+                    {lat: 5.3644, lng: 100.1456},
+                    {lat: 5.5234, lng: 100.1956},
+                    {lat: 5.6278, lng: 100.1956}
+                ],
+                color: "#45b7d1",
+                center: {lat: 5.4164, lng: 100.3327}
+            },
+            "Perak": {
+                coords: [
+                    {lat: 5.4621, lng: 100.5901},
+                    {lat: 5.4621, lng: 101.4183},
+                    {lat: 5.2145, lng: 101.5269},
+                    {lat: 4.8131, lng: 101.4644},
+                    {lat: 4.5738, lng: 101.3669},
+                    {lat: 4.3213, lng: 101.2720},
+                    {lat: 4.0588, lng: 101.1634},
+                    {lat: 3.8544, lng: 101.0901},
+                    {lat: 3.8213, lng: 100.9544},
+                    {lat: 4.0213, lng: 100.8088},
+                    {lat: 4.2319, lng: 100.7588},
+                    {lat: 4.4563, lng: 100.8088},
+                    {lat: 4.7044, lng: 100.8544},
+                    {lat: 4.9074, lng: 100.8901},
+                    {lat: 5.1278, lng: 100.7956},
+                    {lat: 5.3278, lng: 100.6956},
+                    {lat: 5.4621, lng: 100.5901}
+                ],
+                color: "#00d2d3",
+                center: {lat: 4.5921, lng: 101.0901}
+            },
+            "Perlis": {
+                coords: [
+                    {lat: 6.7278, lng: 100.0956},
+                    {lat: 6.7278, lng: 100.3239},
+                    {lat: 6.6234, lng: 100.3739},
+                    {lat: 6.5164, lng: 100.3239},
+                    {lat: 6.4119, lng: 100.2739},
+                    {lat: 6.3075, lng: 100.1827},
+                    {lat: 6.2556, lng: 100.0956},
+                    {lat: 6.4278, lng: 100.0956},
+                    {lat: 6.5278, lng: 100.0956},
+                    {lat: 6.6278, lng: 100.0956},
+                    {lat: 6.7278, lng: 100.0956}
+                ],
+                color: "#fd79a8",
+                center: {lat: 6.4449, lng: 100.1985}
+            },
+            "Sabah": {
+                coords: [
+                    {lat: 7.3804, lng: 115.2735},
+                    {lat: 7.3804, lng: 119.2735},
+                    {lat: 7.1804, lng: 119.3735},
+                    {lat: 6.8804, lng: 119.2735},
+                    {lat: 6.5804, lng: 119.1735},
+                    {lat: 6.2804, lng: 119.0735},
+                    {lat: 5.9804, lng: 118.9735},
+                    {lat: 5.6804, lng: 118.8735},
+                    {lat: 5.3804, lng: 118.7735},
+                    {lat: 5.0804, lng: 118.6735},
+                    {lat: 4.7804, lng: 118.5735},
+                    {lat: 4.4804, lng: 118.4735},
+                    {lat: 4.1804, lng: 118.3735},
+                    {lat: 4.0804, lng: 117.8735},
+                    {lat: 4.0804, lng: 117.2735},
+                    {lat: 4.1804, lng: 116.6735},
+                    {lat: 4.3804, lng: 116.0735},
+                    {lat: 4.5804, lng: 115.6735},
+                    {lat: 4.8804, lng: 115.4735},
+                    {lat: 5.1804, lng: 115.3735},
+                    {lat: 5.4804, lng: 115.2735},
+                    {lat: 5.7804, lng: 115.2735},
+                    {lat: 6.0804, lng: 115.2735},
+                    {lat: 6.3804, lng: 115.2735},
+                    {lat: 6.6804, lng: 115.2735},
+                    {lat: 6.9804, lng: 115.2735},
+                    {lat: 7.2804, lng: 115.2735},
+                    {lat: 7.3804, lng: 115.2735}
+                ],
+                color: "#54a0ff",
+                center: {lat: 5.9804, lng: 116.0735}
+            },
+            "Sarawak": {
+                coords: [
+                    {lat: 4.8533, lng: 109.6592},
+                    {lat: 4.8533, lng: 115.3592},
+                    {lat: 4.5403, lng: 115.3294},
+                    {lat: 4.1403, lng: 115.2294},
+                    {lat: 3.7403, lng: 115.1294},
+                    {lat: 3.3403, lng: 115.0294},
+                    {lat: 2.9403, lng: 114.9294},
+                    {lat: 2.5403, lng: 114.8294},
+                    {lat: 2.1403, lng: 114.7294},
+                    {lat: 1.7403, lng: 114.6294},
+                    {lat: 1.3403, lng: 114.5294},
+                    {lat: 0.9403, lng: 114.4294},
+                    {lat: 0.8533, lng: 113.9592},
+                    {lat: 0.8533, lng: 113.3592},
+                    {lat: 0.9533, lng: 112.6592},
+                    {lat: 1.1533, lng: 111.9592},
+                    {lat: 1.3533, lng: 111.2592},
+                    {lat: 1.5533, lng: 110.5592},
+                    {lat: 1.7533, lng: 109.8592},
+                    {lat: 2.1533, lng: 109.6592},
+                    {lat: 2.5533, lng: 109.6592},
+                    {lat: 2.9533, lng: 109.6592},
+                    {lat: 3.3533, lng: 109.6592},
+                    {lat: 3.7533, lng: 109.6592},
+                    {lat: 4.1533, lng: 109.6592},
+                    {lat: 4.5533, lng: 109.6592},
+                    {lat: 4.8533, lng: 109.6592}
+                ],
+                color: "#ff9ff3",
+                center: {lat: 1.5533, lng: 110.3592}
+            },
+            "Selangor": {
+                coords: [
+                    {lat: 3.8074, lng: 101.0901},
+                    {lat: 3.8074, lng: 101.5183},
+                    {lat: 3.5145, lng: 101.7269},
+                    {lat: 3.2131, lng: 101.7644},
+                    {lat: 3.0738, lng: 101.6669},
+                    {lat: 2.9213, lng: 101.5720},
+                    {lat: 2.7588, lng: 101.3634},
+                    {lat: 2.6544, lng: 101.0901},
+                    {lat: 2.8213, lng: 100.9544},
+                    {lat: 3.1319, lng: 100.8088},
+                    {lat: 3.4563, lng: 100.8588},
+                    {lat: 3.7044, lng: 100.9544},
+                    {lat: 3.8074, lng: 101.0901}
+                ],
+                color: "#4ecdc4",
+                center: {lat: 3.0738, lng: 101.5183}
+            },
+            "Terengganu": {
+                coords: [
+                    {lat: 5.8278, lng: 102.5956},
+                    {lat: 5.8278, lng: 103.4239},
+                    {lat: 5.5234, lng: 103.5739},
+                    {lat: 5.2164, lng: 103.5239},
+                    {lat: 4.9119, lng: 103.4739},
+                    {lat: 4.6075, lng: 103.3827},
+                    {lat: 4.5556, lng: 103.2956},
+                    {lat: 4.5075, lng: 103.1956},
+                    {lat: 4.5644, lng: 103.0456},
+                    {lat: 4.7234, lng: 102.9956},
+                    {lat: 4.9278, lng: 102.9956},
+                    {lat: 5.1278, lng: 102.8956},
+                    {lat: 5.3278, lng: 102.7956},
+                    {lat: 5.5278, lng: 102.6956},
+                    {lat: 5.7278, lng: 102.5956},
+                    {lat: 5.8278, lng: 102.5956}
+                ],
+                color: "#00cec9",
+                center: {lat: 5.1683, lng: 103.0370}
+            },
+            // 3 Federal Territories
+            "Kuala Lumpur": {
+                coords: [
+                    {lat: 3.2131, lng: 101.6669},
+                    {lat: 3.2131, lng: 101.7644},
+                    {lat: 3.0738, lng: 101.7644},
+                    {lat: 3.0738, lng: 101.6669},
+                    {lat: 3.1319, lng: 101.6669},
+                    {lat: 3.1478, lng: 101.6953},
+                    {lat: 3.1728, lng: 101.7269},
+                    {lat: 3.2131, lng: 101.6669}
+                ],
+                color: "#ff6b6b",
+                center: {lat: 3.1478, lng: 101.6953}
+            },
+            "Putrajaya": {
+                coords: [
+                    {lat: 2.9370, lng: 101.6769},
+                    {lat: 2.9370, lng: 101.7144},
+                    {lat: 2.9238, lng: 101.7144},
+                    {lat: 2.9238, lng: 101.6769},
+                    {lat: 2.9304, lng: 101.6769},
+                    {lat: 2.9370, lng: 101.6769}
+                ],
+                color: "#ff7675",
+                center: {lat: 2.9304, lng: 101.6957}
+            },
+            "Labuan": {
+                coords: [
+                    {lat: 5.2834, lng: 115.2404},
+                    {lat: 5.3234, lng: 115.2404},
+                    {lat: 5.3234, lng: 115.2804},
+                    {lat: 5.2834, lng: 115.2804},
+                    {lat: 5.2834, lng: 115.2404}
+                ],
+                color: "#74b9ff",
+                center: {lat: 5.3034, lng: 115.2604}
+            }
+        };
+
+        // Initialize map function
+        function initializeMap() {
+            console.log("Google Maps API loaded, initializing map...");
+            // Wait for the gmp-map element to be ready
+            setTimeout(() => {
+                setupMap();
+            }, 1000);
+        }
+
+        function setupMap() {
+            const gmpMap = document.querySelector('gmp-map');
+            if (gmpMap && google.maps) {
+                // Get the underlying Google Maps instance
+                map = gmpMap.innerMap;
+                if (map) {
+                    console.log("Map instance found, adding state boundaries...");
+                    addStateBoundaries();
+                } else {
+                    console.log("Map instance not ready, retrying...");
+                    setTimeout(setupMap, 500);
+                }
+            } else {
+                console.log("Map element or Google Maps not ready, retrying...");
+                setTimeout(setupMap, 500);
+            }
+        }
+
+        function addStateBoundaries() {
+            // Clear existing polygons
+            statePolygons.forEach(polygon => polygon.setMap(null));
+            statePolygons = [];
+
+            // Add polygon for each state
+            Object.keys(stateBoundaries).forEach(stateName => {
+                const stateData = stateBoundaries[stateName];
+                
+                const polygon = new google.maps.Polygon({
+                    paths: stateData.coords,
+                    strokeColor: stateData.color,
+                    strokeOpacity: 0.9,
+                    strokeWeight: 2,
+                    fillColor: stateData.color,
+                    fillOpacity: 0.15,
+                    clickable: true,
+                    map: map
+                });
+
+                // Add click event to polygon
+                polygon.addListener('click', () => {
+                    clickState(stateName);
+                    highlightState(stateName);
+                });
+
+                // Add hover effects
+                polygon.addListener('mouseover', () => {
+                    polygon.setOptions({
+                        strokeWeight: 4,
+                        fillOpacity: 0.35,
+                        strokeOpacity: 1.0
+                    });
+                    
+                    // Show tooltip-like effect
+                    showStateTooltip(stateName, true);
+                });
+
+                polygon.addListener('mouseout', () => {
+                    polygon.setOptions({
+                        strokeWeight: 2,
+                        fillOpacity: 0.15,
+                        strokeOpacity: 0.9
+                    });
+                    
+                    // Hide tooltip
+                    showStateTooltip(stateName, false);
+                });
+
+                // Store polygon with state name
+                polygon.stateName = stateName;
+                statePolygons.push(polygon);
+            });
+
+            console.log("State boundaries added successfully!");
+        }
+
+        function showStateTooltip(stateName, show) {
+            // Create or remove tooltip overlay
+            let tooltip = document.getElementById('state-tooltip');
+            
+            if (show) {
+                if (!tooltip) {
+                    tooltip = document.createElement('div');
+                    tooltip.id = 'state-tooltip';
+                    tooltip.style.cssText = `
+                        position: absolute;
+                        background: rgba(0,0,0,0.8);
+                        color: #ffd600;
+                        padding: 5px 10px;
+                        border-radius: 5px;
+                        font-family: 'Press Start 2P', cursive;
+                        font-size: 8px;
+                        pointer-events: none;
+                        z-index: 10000;
+                        display: none;
+                        border: 1px solid #ffd600;
+                    `;
+                    document.body.appendChild(tooltip);
+                }
+                
+                const stateData = malaysianStates[stateName];
+                tooltip.innerHTML = `
+                    <strong>${stateName}</strong><br>
+                    Capital: ${stateData.capital}<br>
+                    Heritage Sites: ${stateData.sites.length}
+                `;
+                tooltip.style.display = 'block';
+                
+                // Position tooltip near mouse
+                document.addEventListener('mousemove', positionTooltip);
+            } else {
+                if (tooltip) {
+                    tooltip.style.display = 'none';
+                    document.removeEventListener('mousemove', positionTooltip);
+                }
+            }
+        }
+
+        function positionTooltip(event) {
+            const tooltip = document.getElementById('state-tooltip');
+            if (tooltip) {
+                tooltip.style.left = (event.clientX + 10) + 'px';
+                tooltip.style.top = (event.clientY - 30) + 'px';
+            }
+        }
+
+        // Heritage sites data with state information
+        const heritageSites = [
+            {
+                id: 1,
+                name: "Petronas Twin Towers",
+                category: "cultural",
+                state: "Kuala Lumpur",
+                description: "Iconic twin skyscrapers and symbol of modern Malaysia",
+                details: "Built in 1998, these towers represent Malaysia's economic progress"
+            },
+            {
+                id: 2,
+                name: "George Town UNESCO World Heritage Site",
+                category: "historical",
+                state: "Penang",
+                description: "Historic city with colonial architecture and street art",
+                details: "UNESCO World Heritage Site since 2008"
+            },
+            {
+                id: 3,
+                name: "Melaka Historic City",
+                category: "historical",
+                state: "Melaka",
+                description: "Historic trading port with Portuguese, Dutch, and British influences",
+                details: "UNESCO World Heritage Site showcasing 500 years of history"
+            },
+            {
+                id: 4,
+                name: "Batu Caves",
+                category: "religious",
+                state: "Selangor",
+                description: "Hindu temple complex in limestone caves",
+                details: "Famous for its 272-step staircase and giant golden statue"
+            },
+            {
+                id: 5,
+                name: "National Museum of Malaysia",
+                category: "cultural",
+                state: "Kuala Lumpur",
+                description: "Premier museum showcasing Malaysian history and culture",
+                details: "Established in 1963, houses artifacts from prehistoric times"
+            },
+            {
+                id: 6,
+                name: "Sultan Abdul Samad Building",
+                category: "historical",
+                state: "Kuala Lumpur",
+                description: "Iconic Moorish architecture government building",
+                details: "Built in 1897, features a 41-meter clock tower"
+            },
+            {
+                id: 7,
+                name: "Kek Lok Si Temple",
+                category: "religious",
+                state: "Penang",
+                description: "Largest Buddhist temple in Malaysia",
+                details: "Built in 1891, known for its pagoda and bronze statue"
+            },
+            {
+                id: 8,
+                name: "Sarawak Cultural Village",
+                category: "cultural",
+                state: "Sarawak",
+                description: "Living museum showcasing Sarawak's ethnic diversity",
+                details: "Features traditional houses and cultural performances"
+            },
+            {
+                id: 9,
+                name: "Kinabalu Park",
+                category: "cultural",
+                state: "Sabah",
+                description: "UNESCO World Heritage natural and cultural site",
+                details: "Home to Mount Kinabalu and diverse ecosystems"
+            },
+            {
+                id: 10,
+                name: "Islamic Arts Museum Malaysia",
+                category: "cultural",
+                state: "Kuala Lumpur",
+                description: "Southeast Asia's largest Islamic arts museum",
+                details: "Houses over 7,000 artifacts from the Islamic world"
+            }
+        ];
+
+        // Malaysian states and federal territories information (all 16 regions)
+        const malaysianStates = {
+            // 13 States
+            "Johor": {
+                description: "Southern gateway to Malaysia, rich in history and modern development.",
+                sites: [],
+                capital: "Johor Bahru",
+                population: "3.8 million"
+            },
+            "Kedah": {
+                description: "Rice bowl of Malaysia, birthplace of former Prime Ministers and rich in Malay culture.",
+                sites: ["Alor Setar Tower", "Zahir Mosque"],
+                capital: "Alor Setar",
+                population: "2.2 million"
+            },
+            "Kelantan": {
+                description: "Cradle of Malay culture and Islamic heritage on the east coast.",
+                sites: ["Istana Jahar", "Siti Khadijah Market"],
+                capital: "Kota Bharu", 
+                population: "1.9 million"
+            },
+            "Melaka": {
+                description: "Historic state with 500 years of trading heritage. UNESCO World Heritage Site.",
+                sites: ["Melaka Historic City"],
+                capital: "Melaka City",
+                population: "950,000"
+            },
+            "Negeri Sembilan": {
+                description: "Land of the Minangkabau people with unique architecture and cultural traditions.",
+                sites: ["Istana Seri Menanti", "Minangkabau Architecture"],
+                capital: "Seremban",
+                population: "1.1 million"
+            },
+            "Pahang": {
+                description: "Largest state with tropical rainforests, highlands, and national parks.",
+                sites: ["Taman Negara", "Cameron Highlands"],
+                capital: "Kuantan",
+                population: "1.7 million"
+            },
+            "Penang": {
+                description: "Historic state known for UNESCO World Heritage George Town and vibrant street food culture.",
+                sites: ["George Town UNESCO Site", "Kek Lok Si Temple"],
+                capital: "George Town",
+                population: "1.8 million"
+            },
+            "Perak": {
+                description: "The Silver State, known for tin mining heritage and natural beauty.",
+                sites: [],
+                capital: "Ipoh",
+                population: "2.5 million"
+            },
+            "Perlis": {
+                description: "Smallest state known for agriculture, limestone hills, and border trade.",
+                sites: ["Perlis State Park", "Wang Kelian"],
+                capital: "Kangar",
+                population: "260,000"
+            },
+            "Sabah": {
+                description: "Land below the wind, home to Mount Kinabalu and diverse ecosystems.",
+                sites: ["Kinabalu Park"],
+                capital: "Kota Kinabalu",
+                population: "3.4 million"
+            },
+            "Sarawak": {
+                description: "Largest state in East Malaysia, known for cultural diversity and rainforests.",
+                sites: ["Sarawak Cultural Village"],
+                capital: "Kuching",
+                population: "2.8 million"
+            },
+            "Selangor": {
+                description: "Most developed state surrounding Kuala Lumpur. Economic powerhouse with rich cultural sites.",
+                sites: ["Batu Caves"],
+                capital: "Shah Alam", 
+                population: "6.5 million"
+            },
+            "Terengganu": {
+                description: "East coast state rich in Islamic heritage, traditional crafts, and marine parks.",
+                sites: ["Crystal Mosque", "Islamic Civilization Park"],
+                capital: "Kuala Terengganu",
+                population: "1.2 million"
+            },
+            // 3 Federal Territories
+            "Kuala Lumpur": {
+                description: "Federal Territory and capital city of Malaysia. Modern urban center with iconic landmarks.",
+                sites: ["Petronas Twin Towers", "National Museum", "Sultan Abdul Samad Building", "Islamic Arts Museum"],
+                capital: "Kuala Lumpur",
+                population: "1.8 million"
+            },
+            "Putrajaya": {
+                description: "Federal administrative capital with stunning modern Islamic architecture and gardens.",
+                sites: ["Putra Mosque", "Perdana Putra", "Putrajaya Bridge"],
+                capital: "Putrajaya",
+                population: "130,000"
+            },
+            "Labuan": {
+                description: "Federal territory island and international business hub off the coast of Borneo.",
+                sites: ["Labuan War Cemetery", "Peace Park", "Financial District"],
+                capital: "Victoria",
+                population: "100,000"
+            }
+        };
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            populateSidebar();
+            setupMarkerEvents();
+        });
+
+        function clickState(stateName) {
+            console.log("Clicked state:", stateName);
+            
+            // Zoom to state
+            if (stateBoundaries[stateName]) {
+                const stateData = stateBoundaries[stateName];
+                const gmpMap = document.querySelector('gmp-map');
+                gmpMap.setAttribute('center', `${stateData.center.lat},${stateData.center.lng}`);
+                gmpMap.setAttribute('zoom', '8');
+            }
+            
+            // Filter sites by state
+            filterByState(stateName);
+            
+            // Highlight state button
+            highlightStateButton(stateName);
+            
+            // Show state info
+            showStateInfo(stateName);
+        }
+
+        function highlightState(stateName) {
+            // Reset all polygons
+            statePolygons.forEach(polygon => {
+                polygon.setOptions({
+                    strokeWeight: 2,
+                    fillOpacity: 0.15
+                });
+            });
+            
+            // Highlight selected state
+            const selectedPolygon = statePolygons.find(p => p.stateName === stateName);
+            if (selectedPolygon) {
+                selectedPolygon.setOptions({
+                    strokeWeight: 4,
+                    fillOpacity: 0.4
+                });
+            }
+        }
+
+        function highlightStateButton(stateName) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.state-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            const buttons = document.querySelectorAll('.state-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.trim() === stateName) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function showAllStates() {
+            // Reset map view
+            const gmpMap = document.querySelector('gmp-map');
+            gmpMap.setAttribute('center', '4.2105,101.9758');
+            gmpMap.setAttribute('zoom', '6');
+            
+            // Show all markers
+            showAllSites();
+            
+            // Reset state highlighting
+            statePolygons.forEach(polygon => {
+                polygon.setOptions({
+                    strokeWeight: 2,
+                    fillOpacity: 0.15
+                });
+            });
+            
+            // Remove button highlighting
+            document.querySelectorAll('.state-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Hide state info
+            document.getElementById('stateInfo').style.display = 'none';
+        }
+
+        function populateSidebar() {
+            const heritageList = document.getElementById("heritageList");
+            heritageList.innerHTML = "";
+
+            heritageSites.forEach((site) => {
+                const siteElement = document.createElement("div");
+                siteElement.className = "heritage-item";
+                siteElement.setAttribute("data-site-id", site.id);
+                siteElement.innerHTML = `
+                    <h4>${site.name}</h4>
+                    <p>${site.description}</p>
+                    <p><small>${site.details}</small></p>
+                    <span class="heritage-category">${site.category.toUpperCase()}</span>
+                    <span class="state-label">${site.state}</span>
+                `;
+
+                siteElement.addEventListener("click", () => {
+                    panToSite(site);
+                    highlightSidebarItem(site.id);
+                    showStateInfo(site.state);
+                });
+
+                heritageList.appendChild(siteElement);
+            });
+        }
+
+        function setupMarkerEvents() {
+            const markers = document.querySelectorAll('gmp-advanced-marker');
+            markers.forEach(marker => {
+                marker.addEventListener('click', () => {
+                    const title = marker.getAttribute('title');
+                    const state = marker.getAttribute('data-state');
+                    const site = heritageSites.find(s => s.name === title);
+                    
+                    if (site) {
+                        highlightSidebarItem(site.id);
+                        showStateInfo(state);
+                    }
+                });
+            });
+        }
+
+        function panToSite(site) {
+            const map = document.querySelector('gmp-map');
+            const marker = Array.from(document.querySelectorAll('gmp-advanced-marker'))
+                .find(m => m.getAttribute('title') === site.name);
+            
+            if (marker) {
+                const position = marker.getAttribute('position');
+                map.setAttribute('center', position);
+                map.setAttribute('zoom', '12');
+            }
+        }
+
+        function highlightSidebarItem(siteId) {
+            // Remove previous highlights
+            document.querySelectorAll(".heritage-item").forEach((item) => {
+                item.classList.remove('selected');
+            });
+
+            // Highlight selected item
+            const selectedItem = document.querySelector(`[data-site-id="${siteId}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('selected');
+            }
+        }
+
+        function showStateInfo(stateName) {
+            const stateInfo = document.getElementById('stateInfo');
+            const stateData = malaysianStates[stateName];
+            
+            if (stateData) {
+                document.getElementById('stateName').textContent = `${stateName} State`;
+                document.getElementById('stateDescription').innerHTML = `
+                    <strong>Capital:</strong> ${stateData.capital}<br>
+                    <strong>Population:</strong> ${stateData.population}<br><br>
+                    ${stateData.description}
+                `;
+                document.getElementById('siteCount').textContent = stateData.sites.length;
+                stateInfo.style.display = 'block';
+                
+                // Auto-hide after 8 seconds
+                setTimeout(() => {
+                    stateInfo.style.display = 'none';
+                }, 8000);
+            }
+        }
+
+        function showAllSites() {
+            const markers = document.querySelectorAll('gmp-advanced-marker');
+            markers.forEach(marker => {
+                marker.style.display = 'block';
+            });
+            populateSidebar();
+            resetMapView();
+        }
+
+        function filterByState(stateName) {
+            const markers = document.querySelectorAll('gmp-advanced-marker');
+            markers.forEach(marker => {
+                const markerState = marker.getAttribute('data-state');
+                if (markerState === stateName) {
+                    marker.style.display = 'block';
+                } else {
+                    marker.style.display = 'none';
+                }
+            });
+            
+            // Update sidebar to show only sites from selected state
+            const heritageList = document.getElementById("heritageList");
+            heritageList.innerHTML = "";
+            
+            const filteredSites = heritageSites.filter(site => site.state === stateName);
+            filteredSites.forEach((site) => {
+                const siteElement = document.createElement("div");
+                siteElement.className = "heritage-item";
+                siteElement.setAttribute("data-site-id", site.id);
+                siteElement.innerHTML = `
+                    <h4>${site.name}</h4>
+                    <p>${site.description}</p>
+                    <p><small>${site.details}</small></p>
+                    <span class="heritage-category">${site.category.toUpperCase()}</span>
+                    <span class="state-label">${site.state}</span>
+                `;
+
+                siteElement.addEventListener("click", () => {
+                    panToSite(site);
+                    highlightSidebarItem(site.id);
+                    showStateInfo(site.state);
+                });
+
+                heritageList.appendChild(siteElement);
+            });
+            
+            // Show state info
+            showStateInfo(stateName);
+        }
+
+        function resetMapView() {
+            const map = document.querySelector('gmp-map');
+            map.setAttribute('center', '4.2105,101.9758');
+            map.setAttribute('zoom', '6');
+            
+            // Hide state info
+            document.getElementById('stateInfo').style.display = 'none';
+            
+            // Remove highlights
+            document.querySelectorAll(".heritage-item").forEach((item) => {
+                item.classList.remove('selected');
+            });
+        }
+    </script>
+</body>
+</html> 

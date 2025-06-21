@@ -1,4 +1,5 @@
 <?php
+session_start();
 require 'db.php';
 
 $name = $_POST['name'];
@@ -19,7 +20,7 @@ if ($name && $password) {
         if (password_verify($password, $hashedPassword)) {
             $_SESSION['user_id'] = $user['id'];  // Assuming your users table has 'id' column
             $_SESSION['user_name'] = $user['name']; // (Optional) can also store name
-            header("Location: rules.html);
+            header("Location: rules.html");
             exit();
         } else {
             echo "<script>
