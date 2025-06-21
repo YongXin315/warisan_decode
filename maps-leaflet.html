@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Heritage Map - Warisan Decode</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        .map-container {
+            margin-top: 70px;
+            height: calc(100vh - 70px);
+            position: relative;
+        }
+        
+        .map-sidebar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 350px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 3px solid #ffd600;
+            z-index: 1000;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+        
+        .map-sidebar h2 {
+            font-size: 14px;
+            color: #000;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #ffd600;
+            padding-bottom: 10px;
+        }
+        
+        .heritage-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .heritage-item {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .heritage-item:hover {
+            background-color: rgba(255, 214, 0, 0.2);
+            border-color: #ffd600;
+            transform: translateY(-2px);
+        }
+        
+        .heritage-item.selected {
+            background-color: rgba(255, 214, 0, 0.3);
+            border-color: #ffd600;
+        }
+        
+        .heritage-item h4 {
+            font-size: 10px;
+            color: #000;
+            margin-bottom: 8px;
+        }
+        
+        .heritage-item p {
+            font-size: 8px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .heritage-category {
+            display: inline-block;
+            background-color: #ffd600;
+            color: #000;
+            font-size: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+        }
+        
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .map-btn {
+            background-color: #ffd600;
+            color: #000;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-family: "Press Start 2P", cursive;
+            font-size: 8px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: block;
+            width: 150px;
+            transition: all 0.3s ease;
+        }
+        
+        .map-btn:hover {
+            background-color: #ffa000;
+            transform: translateY(-2px);
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #ffd600;
+            z-index: 1000;
+        }
+        
+        .legend h4 {
+            font-size: 10px;
+            color: #000;
+            margin-bottom: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 7px;
+        }
+        
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 8px;
+            border: 2px solid #000;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-family: "Press Start 2P", cursive;
+            color: #ffd600;
+            font-size: 12px;
+        }
+        
+        /* Custom popup styles */
+        .leaflet-popup-content-wrapper {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            border: 2px solid #ffd600;
+            font-family: "Press Start 2P", cursive;
+        }
+        
+        .leaflet-popup-content {
+            margin: 15px;
+            font-size: 8px;
+        }
+        
+        .popup-content h3 {
+            font-size: 10px;
+            color: #000;
+            margin-bottom: 8px;
+        }
+        
+        .popup-content p {
+            font-size: 7px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .popup-category {
+            background-color: #ffd600;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 6px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        
+        @media (max-width: 768px) {
+            .map-sidebar {
+                width: 280px;
+                left: 10px;
+                top: 10px;
+            }
+            
+            .map-controls {
+                right: 10px;
+                top: 10px;
+            }
+            
+            .map-btn {
+                width: 120px;
+                font-size: 6px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div>LOADING HERITAGE MAP...</div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="welcome.php">WARISAN DECODE</a>
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="welcome.php">Home</a>
+                    <a class="nav-link active" href="maps-leaflet.html">Heritage Map</a>
+                    <a class="nav-link" href="profile.php">Profile</a>
+                    <a class="nav-link" href="logout.php">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="map-container">
+        <!-- Map Sidebar -->
+        <div class="map-sidebar">
+            <h2>🗺️ HERITAGE SITES</h2>
+            <div class="heritage-list" id="heritageList">
+                <!-- Heritage sites will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Map Controls -->
+        <div class="map-controls">
+            <button class="map-btn" onclick="showAllSites()">SHOW ALL SITES</button>
+            <button class="map-btn" onclick="filterByCategory('historical')">HISTORICAL</button>
+            <button class="map-btn" onclick="filterByCategory('cultural')">CULTURAL</button>
+            <button class="map-btn" onclick="filterByCategory('religious')">RELIGIOUS</button>
+            <button class="map-btn" onclick="resetMapView()">RESET VIEW</button>
+        </div>
+
+        <!-- Map -->
+        <div id="map"></div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <h4>🏛️ SITE TYPES</h4>
+            <div class="legend-item">
+                <div class="legend-icon" style="background-color: #ff4444"></div>
+                <span>Historical Sites</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon" style="background-color: #44ff44"></div>
+                <span>Cultural Centers</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon" style="background-color: #4444ff"></div>
+                <span>Religious Sites</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon" style="background-color: #ffaa00"></div>
+                <span>Museums</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let map;
+        let markers = [];
+        let markersLayer;
+        
+        // Heritage sites data
+        const heritageSites = [
+            {
+                id: 1,
+                name: "Petronas Twin Towers",
+                lat: 3.1579,
+                lng: 101.7121,
+                category: "cultural",
+                description: "Iconic twin skyscrapers and symbol of modern Malaysia",
+                details: "Built in 1998, these towers represent Malaysia's economic progress",
+                color: "#44ff44"
+            },
+            {
+                id: 2,
+                name: "George Town UNESCO World Heritage Site",
+                lat: 5.4164,
+                lng: 100.3327,
+                category: "historical",
+                description: "Historic city with colonial architecture and street art",
+                details: "UNESCO World Heritage Site since 2008",
+                color: "#ff4444"
+            },
+            {
+                id: 3,
+                name: "Melaka Historic City",
+                lat: 2.2055,
+                lng: 102.2502,
+                category: "historical",
+                description: "Historic trading port with Portuguese, Dutch, and British influences",
+                details: "UNESCO World Heritage Site showcasing 500 years of history",
+                color: "#ff4444"
+            },
+            {
+                id: 4,
+                name: "Batu Caves",
+                lat: 3.2379,
+                lng: 101.684,
+                category: "religious",
+                description: "Hindu temple complex in limestone caves",
+                details: "Famous for its 272-step staircase and giant golden statue",
+                color: "#4444ff"
+            },
+            {
+                id: 5,
+                name: "National Museum of Malaysia",
+                lat: 3.1412,
+                lng: 101.6865,
+                category: "cultural",
+                description: "Premier museum showcasing Malaysian history and culture",
+                details: "Established in 1963, houses artifacts from prehistoric times",
+                color: "#ffaa00"
+            },
+            {
+                id: 6,
+                name: "Sultan Abdul Samad Building",
+                lat: 3.1477,
+                lng: 101.6953,
+                category: "historical",
+                description: "Iconic Moorish architecture government building",
+                details: "Built in 1897, features a 41-meter clock tower",
+                color: "#ff4444"
+            },
+            {
+                id: 7,
+                name: "Kek Lok Si Temple",
+                lat: 5.3951,
+                lng: 100.2717,
+                category: "religious",
+                description: "Largest Buddhist temple in Malaysia",
+                details: "Built in 1891, known for its pagoda and bronze statue",
+                color: "#4444ff"
+            },
+            {
+                id: 8,
+                name: "Sarawak Cultural Village",
+                lat: 1.7403,
+                lng: 110.3294,
+                category: "cultural",
+                description: "Living museum showcasing Sarawak's ethnic diversity",
+                details: "Features traditional houses and cultural performances",
+                color: "#44ff44"
+            },
+            {
+                id: 9,
+                name: "Kinabalu Park",
+                lat: 6.0833,
+                lng: 116.5583,
+                category: "cultural",
+                description: "UNESCO World Heritage natural and cultural site",
+                details: "Home to Mount Kinabalu and diverse ecosystems",
+                color: "#44ff44"
+            },
+            {
+                id: 10,
+                name: "Islamic Arts Museum Malaysia",
+                lat: 3.1416,
+                lng: 101.6908,
+                category: "cultural",
+                description: "Southeast Asia's largest Islamic arts museum",
+                details: "Houses over 7,000 artifacts from the Islamic world",
+                color: "#ffaa00"
+            }
+        ];
+
+        function initMap() {
+            // Initialize map centered on Malaysia
+            map = L.map('map').setView([4.2105, 101.9758], 6);
+
+            // Add tile layer (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Create a layer group for markers
+            markersLayer = L.layerGroup().addTo(map);
+
+            // Add markers for heritage sites
+            addMarkersToMap();
+            
+            // Populate sidebar
+            populateSidebar();
+            
+            // Hide loading overlay
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function addMarkersToMap() {
+            markers = [];
+            
+            heritageSites.forEach((site) => {
+                // Create custom icon
+                const customIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        background-color: ${site.color};
+                        border: 3px solid #000;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                    "></div>`,
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
+
+                const marker = L.marker([site.lat, site.lng], { 
+                    icon: customIcon 
+                }).addTo(markersLayer);
+
+                // Create popup content
+                const popupContent = `
+                    <div class="popup-content">
+                        <h3>${site.name}</h3>
+                        <p><strong>Type:</strong> ${site.category.toUpperCase()}</p>
+                        <p>${site.description}</p>
+                        <p><small>${site.details}</small></p>
+                        <span class="popup-category">${site.category.toUpperCase()}</span>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+                
+                marker.on('click', () => {
+                    highlightSidebarItem(site.id);
+                });
+
+                // Store site data with marker
+                marker.siteData = site;
+                markers.push(marker);
+            });
+        }
+
+        function populateSidebar() {
+            const heritageList = document.getElementById("heritageList");
+            heritageList.innerHTML = "";
+
+            heritageSites.forEach((site) => {
+                const siteElement = document.createElement("div");
+                siteElement.className = "heritage-item";
+                siteElement.setAttribute("data-site-id", site.id);
+                siteElement.innerHTML = `
+                    <h4>${site.name}</h4>
+                    <p>${site.description}</p>
+                    <p><small>${site.details}</small></p>
+                    <span class="heritage-category">${site.category.toUpperCase()}</span>
+                `;
+
+                siteElement.addEventListener("click", () => {
+                    // Pan to marker
+                    map.setView([site.lat, site.lng], 15);
+                    
+                    // Find and open popup
+                    const marker = markers.find(m => m.siteData.id === site.id);
+                    if (marker) {
+                        marker.openPopup();
+                    }
+                    
+                    highlightSidebarItem(site.id);
+                });
+
+                heritageList.appendChild(siteElement);
+            });
+        }
+
+        function highlightSidebarItem(siteId) {
+            // Remove previous highlights
+            document.querySelectorAll(".heritage-item").forEach((item) => {
+                item.classList.remove('selected');
+            });
+
+            // Highlight selected item
+            const selectedItem = document.querySelector(`[data-site-id="${siteId}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('selected');
+            }
+        }
+
+        function showAllSites() {
+            markersLayer.clearLayers();
+            addMarkersToMap();
+            populateSidebar();
+            resetMapView();
+        }
+
+        function filterByCategory(category) {
+            markersLayer.clearLayers();
+            markers = [];
+            
+            const filteredSites = heritageSites.filter(site => site.category === category);
+            
+            filteredSites.forEach((site) => {
+                const customIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        background-color: ${site.color};
+                        border: 3px solid #000;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                    "></div>`,
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
+
+                const marker = L.marker([site.lat, site.lng], { 
+                    icon: customIcon 
+                }).addTo(markersLayer);
+
+                const popupContent = `
+                    <div class="popup-content">
+                        <h3>${site.name}</h3>
+                        <p><strong>Type:</strong> ${site.category.toUpperCase()}</p>
+                        <p>${site.description}</p>
+                        <p><small>${site.details}</small></p>
+                        <span class="popup-category">${site.category.toUpperCase()}</span>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+                marker.siteData = site;
+                markers.push(marker);
+            });
+            
+            // Update sidebar
+            const heritageList = document.getElementById("heritageList");
+            heritageList.innerHTML = "";
+            
+            filteredSites.forEach((site) => {
+                const siteElement = document.createElement("div");
+                siteElement.className = "heritage-item";
+                siteElement.setAttribute("data-site-id", site.id);
+                siteElement.innerHTML = `
+                    <h4>${site.name}</h4>
+                    <p>${site.description}</p>
+                    <p><small>${site.details}</small></p>
+                    <span class="heritage-category">${site.category.toUpperCase()}</span>
+                `;
+
+                siteElement.addEventListener("click", () => {
+                    map.setView([site.lat, site.lng], 15);
+                    
+                    const marker = markers.find(m => m.siteData.id === site.id);
+                    if (marker) {
+                        marker.openPopup();
+                    }
+                    
+                    highlightSidebarItem(site.id);
+                });
+
+                heritageList.appendChild(siteElement);
+            });
+        }
+
+        function resetMapView() {
+            map.setView([4.2105, 101.9758], 6);
+            map.closePopup();
+            
+            // Remove sidebar highlights
+            document.querySelectorAll(".heritage-item").forEach((item) => {
+                item.classList.remove('selected');
+            });
+        }
+
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+        });
+    </script>
+</body>
+</html> 
