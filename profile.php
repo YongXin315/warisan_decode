@@ -33,7 +33,7 @@
     </nav>
   
     <!-- ✅ Move scroll content here -->
-    <div class="scroll-container">
+    <div class="scroll-container" style="text-align: center;">
         <?php
             session_start();
             include 'db.php';
@@ -46,8 +46,8 @@
             $userId = $_SESSION['user_id'];
             $userName = $_SESSION['user_name']; // optional if you stored it
 
-            echo "<h2>👤 Welcome, $userName</h2>";
-            echo "<h3>🏅 Your Badge Collection</h3>";
+            echo "<h2 style='font-size: 30px;'>👤 Welcome, $userName</h2>";
+            echo "<h3 style='font-size: 20px; padding-bottom: 20px;'>🏅 Your Badge Collection</h3>";
 
             // Fetch user's badges
             $sql = "SELECT badge_name FROM user_badges WHERE user_id = ?";
@@ -75,7 +75,7 @@
             foreach ($allBadges as $badge) {
                 $badgeImage = "assets/badges/{$badge}.png";
                 $status = in_array($badge, $unlockedBadges) ? "" : "opacity: 0.2; filter: grayscale(100%);";
-                echo "<div style='text-align: center;'>
+                echo "<div style='text-align: center; width: 100%; display: block; padding-bottom: 25px;'>
                         <img src='$badgeImage' alt='$badge' width='100' style='$status border-radius: 10px;'><br>
                         <small>$badge</small>
                     </div>";
@@ -86,6 +86,3 @@
       
   </body>
 </html>  
-
-
-
