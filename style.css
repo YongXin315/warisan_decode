@@ -1,0 +1,117 @@
+/* Full height and background */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Press Start 2P', cursive;
+    background: url('map-flag-malaysia-old-vintage-crack-paper-background-d-illustration-map-flag-malaysia-old-vintage-crack-324067705.webp') no-repeat center center fixed;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  /* Bootstrap override for transparent navbar */
+  .navbar {
+    background-color: rgba(0, 0, 0, 0.75) !important;
+  }
+  
+  .navbar-brand,
+  .navbar-nav .nav-link {
+    color: #fff !important;
+    font-size: 12px;
+  }
+  
+  .navbar-nav .nav-link:hover {
+    text-decoration: underline;
+  }
+
+  .moving-title {
+    position: absolute;
+    top: 80px; /* below navbar */
+    width: 100%;
+    text-align: center;
+    font-size: 50px;
+    color: #fff;
+    animation: slide-in 15s ease-in-out infinite alternate;
+    font-family: 'Press Start 2P', cursive;
+    text-shadow: 2px 2px #000;
+    margin-top: 50px;
+  }
+  
+  /* Animation: slide back and forth */
+  @keyframes slide-in {
+    0% { transform: translateX(-30%); }
+    100% { transform: translateX(30%); }
+  }
+  
+  
+  /* Login Box */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 70px); /* subtract navbar height */
+    margin-top: 70px; /* match navbar height */
+  }
+  
+  
+  .login-box {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    height: 300px;
+    width: 500px;
+  }
+  
+  .login-box h2 {
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #000;
+  }
+  
+  .login-box input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 10px;
+  }
+  
+  .login-box button {
+    width: 100%;
+    padding: 10px;
+    font-family: 'Press Start 2P', cursive;
+    background-color: #ffd600;
+    color: #000;
+    border: 2px solid #000;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+  }
+  
+  .login-box button:hover {
+    background-color: #ffa000;
+  }
+
+  .signup-text {
+    margin-top: 15px;
+    font-size: 10px; /* smaller than before */
+    color: #333;
+    text-align: center;
+  }
+  
+  .signup-text a {
+    color: #000;
+    text-decoration: underline;
+  }
+  
+  .signup-text a:hover {
+    color: #ffa000;
+  }
+  
+  
